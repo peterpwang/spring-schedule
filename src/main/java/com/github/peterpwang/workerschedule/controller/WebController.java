@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class WebController {
-    
+
 	@RequestMapping(value = "/")
-    public String index() {
-        return "index";
-    }
-   
+	public String index() {
+		return "index";
+	}
+
 	@RequestMapping("/login")
 	public String login() {
 		return "login";

@@ -12,23 +12,20 @@ import org.springframework.validation.Validator;
 
 @Configuration
 public class ValidatorEventRegister implements InitializingBean {
- 
-    @Autowired
-    ValidatingRepositoryEventListener validatingRepositoryEventListener;
- 
-    @Autowired
-    private Map<String, Validator> validators;
- 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        List<String> events = Arrays.asList("beforeCreate", "afterCreate", "beforeSave", "afterSave", "beforeLinkSave", "afterLinkSave", "beforeDelete", "afterDelete");
-        for (Map.Entry<String, Validator> entry : validators.entrySet()) {
-            events.stream()
-              .filter(p -> entry.getKey().startsWith(p))
-              .findFirst()
-              .ifPresent(
-                p -> validatingRepositoryEventListener
-                  .addValidator(p, entry.getValue()));
-        }
-    }
+
+	@Autowired
+	ValidatingRepositoryEventListener validatingRepositoryEventListener;
+
+	@Autowired
+	private Map<String, Validator> validators;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		List<String> events = Arrays.asList("beforeCreate", "afterCreate", "beforeSave", "afterSave", "beforeLinkSave",
+				"afterLinkSave", "beforeDelete", "afterDelete");
+		for (Map.Entry<String, Validator> entry : validators.entrySet()) {
+			events.stream().filter(p -> entry.getKey().startsWith(p)).findFirst()
+					.ifPresent(p -> validatingRepositoryEventListener.addValidator(p, entry.getValue()));
+		}
+	}
 }

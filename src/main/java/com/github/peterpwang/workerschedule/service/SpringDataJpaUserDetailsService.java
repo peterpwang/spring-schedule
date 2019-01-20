@@ -24,11 +24,11 @@ public class SpringDataJpaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
 		Manager manager = this.repository.findByName(name);
-		
+
 		if (manager == null) {
-            throw new UsernameNotFoundException(name);
-        }
-		
+			throw new UsernameNotFoundException(name);
+		}
+
 		return new User(manager.getName(), manager.getPassword(),
 				AuthorityUtils.createAuthorityList(manager.getRoles()));
 	}

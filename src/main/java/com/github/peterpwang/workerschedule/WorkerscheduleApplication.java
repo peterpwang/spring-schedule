@@ -10,4 +10,3 @@ public class WorkerscheduleApplication {
 		SpringApplication.run(WorkerscheduleApplication.class, args);
 	}
 }
-

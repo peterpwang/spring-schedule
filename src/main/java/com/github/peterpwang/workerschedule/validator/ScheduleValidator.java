@@ -3,6 +3,7 @@ package com.github.peterpwang.workerschedule.validator;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
 import com.github.peterpwang.workerschedule.domain.Schedule;
 
 @Component("beforeCreateScheduleValidator")
@@ -15,7 +16,7 @@ public class ScheduleValidator implements Validator {
  
     @Override
     public void validate(Object obj, Errors errors) {
-        Schedule schedule = (Schedule) obj;
+		Schedule schedule = (Schedule) obj;
 
         if (Checker.checkEmpty(schedule.getName())) {
             errors.rejectValue("name", "schedule.name.notNull");

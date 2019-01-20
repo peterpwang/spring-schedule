@@ -28,7 +28,8 @@ public class UserRestEventHandler {
 	private final ManagerRepository managerRepository;
 
 	@Autowired
-	public UserRestEventHandler(SimpMessagingTemplate websocket, EntityLinks entityLinks, ManagerRepository managerRepository) {
+	public UserRestEventHandler(SimpMessagingTemplate websocket, EntityLinks entityLinks,
+			ManagerRepository managerRepository) {
 		this.websocket = websocket;
 		this.entityLinks = entityLinks;
 		this.managerRepository = managerRepository;
@@ -49,29 +50,26 @@ public class UserRestEventHandler {
 
 	@HandleAfterCreate
 	public void newUser(User user) {
-		this.websocket.convertAndSend(
-				WebSocketConfiguration.MESSAGE_PREFIX + "/newUser", getUserPath(user));
+		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/newUser", getUserPath(user));
 	}
 
 	@HandleAfterDelete
 	public void deleteUser(User user) {
-		this.websocket.convertAndSend(
-				WebSocketConfiguration.MESSAGE_PREFIX + "/deleteUser", getUserPath(user));
+		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/deleteUser", getUserPath(user));
 	}
 
 	@HandleAfterSave
 	public void updateUser(User user) {
-		this.websocket.convertAndSend(
-				WebSocketConfiguration.MESSAGE_PREFIX + "/updateUser", getUserPath(user));
+		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/updateUser", getUserPath(user));
 	}
 
 	/**
-	 * Take an {@link User} and get the URI using Spring Data REST's {@link EntityLinks}.
+	 * Take an {@link User} and get the URI using Spring Data REST's
+	 * {@link EntityLinks}.
 	 *
 	 * @param user
 	 */
 	private String getUserPath(User user) {
-		return this.entityLinks.linkForSingleResource(user.getClass(),
-				user.getId()).toUri().getPath();
+		return this.entityLinks.linkForSingleResource(user.getClass(), user.getId()).toUri().getPath();
 	}
 }
