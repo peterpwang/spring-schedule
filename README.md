@@ -7,9 +7,9 @@ Technical stacks:
 3. Support CRSF.
 4. Server side validation: Event handler.
 5. Client side validation: Html5 validator. 
-6. Bootstrap 4, popper and JQuery.
+6. Bootstrap 4, Popper and JQuery.
 7. Spring MVC.
 8. ReactJS-Router.
 9. Support to H2.
-7. Test case.
+10. Test case.
 
