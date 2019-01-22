@@ -10,6 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.validation.Validator;
 
+/**
+ * Validator event register class
+ * @author Pei Wang
+ *
+ */
 @Configuration
 public class ValidatorEventRegister implements InitializingBean {
 
@@ -19,6 +24,9 @@ public class ValidatorEventRegister implements InitializingBean {
 	@Autowired
 	private Map<String, Validator> validators;
 
+	/**
+	 * Register events for validators
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		List<String> events = Arrays.asList("beforeCreate", "afterCreate", "beforeSave", "afterSave", "beforeLinkSave",

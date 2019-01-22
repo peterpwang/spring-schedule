@@ -15,6 +15,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
+/**
+ * Schedule class
+ */
 @Data
 @Entity
 @Table(name = "schedules")

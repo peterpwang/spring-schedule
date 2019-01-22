@@ -38,6 +38,11 @@ import com.github.peterpwang.workerschedule.service.ScheduleService;
 
 import lombok.Data;
 
+/**
+ * Schedule controller class
+ * @author Pei Wang
+ *
+ */
 @RestController
 @RequestMapping("/api")
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
@@ -53,6 +58,12 @@ public class ScheduleController {
 		this.service = service;
 	}
 
+	/**
+	 * Find schedule list
+	 * @param pageable
+	 * @param assembler
+	 * @return ResponseEntity
+	 */
 	@GetMapping(value = "/schedules", produces = "application/hal+json")
 	public ResponseEntity<PagedResources<ScheduleResource>> findSchedule(Pageable pageable,
 			PagedResourcesAssembler assembler) {
@@ -69,6 +80,11 @@ public class ScheduleController {
 		return new ResponseEntity<>(resources, responseHeaders, HttpStatus.OK);
 	}
 
+	/**
+	 * New schedule
+	 * @param newSchedule
+	 * @return Schedule
+	 */
 	@PostMapping("/schedules")
 	public Schedule newSchedule(@Valid @RequestBody Schedule newSchedule) {
 
@@ -76,7 +92,11 @@ public class ScheduleController {
 		return service.save(newSchedule);
 	}
 
-	// Single item
+	/**
+	 * Get schedule by id
+	 * @param id
+	 * @return ScheduleResource
+	 */
 	@GetMapping("/schedules/{id}")
 	public ScheduleResource getSchedule(@PathVariable Long id) {
 		Optional<Schedule> optional = service.findById(id);
@@ -84,6 +104,12 @@ public class ScheduleController {
 		return new ScheduleResourceAssembler().toResource(schedule);
 	}
 
+	/**
+	 * Update schedule
+	 * @param newSchedule
+	 * @param id
+	 * @return Schedule
+	 */
 	@PutMapping("/schedules/{id}")
 	public Schedule updateSchedule(@RequestBody Schedule newSchedule, @PathVariable Long id) {
 
@@ -103,11 +129,19 @@ public class ScheduleController {
 		});
 	}
 
+	/**
+	 * Delete schedule
+	 * @param id
+	 */
 	@DeleteMapping("/schedules/{id}")
 	public void deleteSchedule(@PathVariable Long id) {
 		service.deleteById(id);
 	}
 
+	/**
+	 * Add manager into database where it is not present. Should be deleted in the future.
+	 * @param schedule
+	 */
 	private void applyScheduleInformationUsingSecurityContext(Schedule schedule) {
 
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -119,6 +153,13 @@ public class ScheduleController {
 		schedule.setManager(manager);
 	}
 
+	/**
+	 * Create paganation links
+	 * @param page
+	 * @param pageParam
+	 * @param sizeParam
+	 * @return List<Link>
+	 */
 	public static <T> List<Link> createLinks(Page<T> page, String pageParam, String sizeParam) {
 		List<Link> links = new LinkedList<>();
 		addPreviousLink(links, page, pageParam, sizeParam);
@@ -129,6 +170,13 @@ public class ScheduleController {
 		return links;
 	}
 
+	/**
+	 * Create previous page link
+	 * @param links
+	 * @param page
+	 * @param pageParam
+	 * @param sizeParam
+	 */
 	private static <T> void addPreviousLink(List<Link> links, Page<T> page, String pageParam, String sizeParam) {
 		if (page.hasPrevious()) {
 			Link link = buildPageLink(pageParam, page.getNumber() - 1, sizeParam, page.getSize(), Link.REL_PREVIOUS);
@@ -136,6 +184,13 @@ public class ScheduleController {
 		}
 	}
 
+	/**
+	 * Create next page link
+	 * @param links
+	 * @param page
+	 * @param pageParam
+	 * @param sizeParam
+	 */
 	private static <T> void addNextLink(List<Link> links, Page<T> page, String pageParam, String sizeParam) {
 		if (page.hasNext()) {
 			Link link = buildPageLink(pageParam, page.getNumber() + 1, sizeParam, page.getSize(), Link.REL_NEXT);
@@ -143,39 +198,60 @@ public class ScheduleController {
 		}
 	}
 
+	/**
+	 * Create first page link
+	 * @param links
+	 * @param page
+	 * @param pageParam
+	 * @param sizeParam
+	 */
 	private static <T> void addFirstLink(List<Link> links, Page<T> page, String pageParam, String sizeParam) {
 		Link link = buildPageLink(pageParam, 0, sizeParam, page.getSize(), Link.REL_FIRST);
 		links.add(link);
 	}
 
+	/**
+	 * Create last page link
+	 * @param links
+	 * @param page
+	 * @param pageParam
+	 * @param sizeParam
+	 */
 	private static <T> void addLastLink(List<Link> links, Page<T> page, String pageParam, String sizeParam) {
 		Link link = buildPageLink(pageParam, page.getTotalPages() - 1, sizeParam, page.getSize(), Link.REL_LAST);
 		links.add(link);
 	}
 
+	
+	/**
+	 * Create a specific page link
+	 * @param pageParam
+	 * @param page
+	 * @param sizeParam
+	 * @param size
+	 * @param rel
+	 * @return Link
+	 */
 	private static Link buildPageLink(String pageParam, int page, String sizeParam, int size, String rel) {
 		String path = createBuilder().queryParam(pageParam, page).queryParam(sizeParam, size).build().toUriString();
 		Link link = new Link(path, rel);
 		return link;
 	}
 
+	/**
+	 * Create URI builder
+	 * @return ServletUriComponentsBuilder
+	 */
 	private static ServletUriComponentsBuilder createBuilder() {
 		return ServletUriComponentsBuilder.fromCurrentRequestUri();
 	}
-
-	private String createLinkHeader(PagedResources<Schedule> pr) {
-		final StringBuilder linkHeader = new StringBuilder();
-		linkHeader.append(buildLinkHeader(pr.getLinks("first").get(0).getHref(), "first"));
-		linkHeader.append(", ");
-		linkHeader.append(buildLinkHeader(pr.getLinks("next").get(0).getHref(), "next"));
-		return linkHeader.toString();
-	}
-
-	public static String buildLinkHeader(final String uri, final String rel) {
-		return "<" + uri + ">; rel=\"" + rel + "\"";
-	}
 }
 
+/**
+ * Schedule resource class
+ * @author Pei Wang
+ *
+ */
 @Data
 class ScheduleResource extends ResourceSupport {
 
@@ -189,11 +265,19 @@ class ScheduleResource extends ResourceSupport {
 	private Manager manager;
 }
 
+/**
+ * Schedule resource assembler
+ * @author Pei Wang
+ *
+ */
 class ScheduleResourceAssembler extends ResourceAssemblerSupport<Schedule, ScheduleResource> {
 	public ScheduleResourceAssembler() {
 		super(ScheduleController.class, ScheduleResource.class);
 	}
 
+	/**
+	 * Converter from Schedule to ScheduleResource
+	 */
 	@Override
 	public ScheduleResource toResource(Schedule entity) {
 		ScheduleResource er = super.createResourceWithId(entity.getId(), entity);

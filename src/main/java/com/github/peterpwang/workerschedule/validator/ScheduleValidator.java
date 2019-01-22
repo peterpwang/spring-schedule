@@ -6,6 +6,10 @@ import org.springframework.validation.Validator;
 
 import com.github.peterpwang.workerschedule.domain.Schedule;
 
+/**
+ * Schedule validator
+ * @author Pei Wang
+ */
 @Component("beforeCreateScheduleValidator")
 public class ScheduleValidator implements Validator {
  

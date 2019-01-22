@@ -12,6 +12,11 @@ import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
 import com.github.peterpwang.workerschedule.repository.UserRepository;
 
+/**
+ * Database loader for initial data
+ * @author Pei Wang
+ *
+ */
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
@@ -24,6 +29,9 @@ public class DatabaseLoader implements CommandLineRunner {
 		this.managerRepository = managerRepository;
 	}
 
+	/**
+	 * Create manager & user data
+	 */
 	@Override
 	public void run(String... strings) throws Exception {
 		Manager peter = this.managerRepository.save(new Manager(0L, "peter", "pass", "ROLE_MANAGER"));

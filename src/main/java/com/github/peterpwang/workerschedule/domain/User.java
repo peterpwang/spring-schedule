@@ -15,6 +15,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
+/**
+ * User class
+ * @author Pei Wang
+ *
+ */
 @Data
 @Entity
 @Table(name = "users")

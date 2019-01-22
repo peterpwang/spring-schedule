@@ -17,6 +17,11 @@ import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
 
+/**
+ * User repository event handler
+ * @author Pei Wang
+ *
+ */
 @Component
 @RepositoryEventHandler(User.class)
 public class UserRestEventHandler {
@@ -35,6 +40,10 @@ public class UserRestEventHandler {
 		this.managerRepository = managerRepository;
 	}
 
+	/**
+	 * Add manager information to user object before create and save
+	 * @param user
+	 */
 	@HandleBeforeCreate
 	@HandleBeforeSave
 	public void applyUserInformationUsingSecurityContext(User user) {
@@ -48,16 +57,28 @@ public class UserRestEventHandler {
 		user.setManager(manager);
 	}
 
+	/**
+	 * Notify clients after creation
+	 * @param user
+	 */
 	@HandleAfterCreate
 	public void newUser(User user) {
 		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/newUser", getUserPath(user));
 	}
 
+	/**
+	 * Notify clients after delete
+	 * @param user
+	 */
 	@HandleAfterDelete
 	public void deleteUser(User user) {
 		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/deleteUser", getUserPath(user));
 	}
 
+	/**
+	 * Notify clients after update
+	 * @param user
+	 */
 	@HandleAfterSave
 	public void updateUser(User user) {
 		this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/updateUser", getUserPath(user));

@@ -6,6 +6,10 @@ import org.springframework.validation.Validator;
 
 import com.github.peterpwang.workerschedule.domain.User;
 
+/**
+ * User validator
+ * @author Pei Wang
+ */
 @Component("beforeCreateUserValidator")
 public class UserValidator implements Validator {
 

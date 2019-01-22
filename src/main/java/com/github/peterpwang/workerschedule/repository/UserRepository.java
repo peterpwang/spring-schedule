@@ -6,6 +6,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.github.peterpwang.workerschedule.domain.User;
 
+/**
+ * User repository class
+ * @author Pei Wang
+ *
+ */
 @PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 

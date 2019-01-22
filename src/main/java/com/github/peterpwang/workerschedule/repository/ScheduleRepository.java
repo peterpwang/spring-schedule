@@ -5,6 +5,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.github.peterpwang.workerschedule.domain.Schedule;
 
+/**
+ * Schedule repository class
+ * @author Pei Wang
+ *
+ */
 @PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface ScheduleRepository extends PagingAndSortingRepository<Schedule, Long> {
 }

@@ -12,6 +12,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.service.SpringDataJpaUserDetailsService;
 
+/**
+ * Spring security configuration class
+ * @author Pei Wang
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -20,12 +25,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private SpringDataJpaUserDetailsService userDetailsService;
 
+	/**
+	 * Provide user/password security service
+	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(this.userDetailsService)
 				.passwordEncoder(Manager.PASSWORD_ENCODER);
 	}
-
+	
+	/**
+	 * Configure protected paths and login/logout URIs
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -41,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and()
 			.httpBasic()
 				.and()
-			.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+			.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Support CSRF in cookies
 				.and()
 			.logout()
 				.logoutSuccessUrl("/");

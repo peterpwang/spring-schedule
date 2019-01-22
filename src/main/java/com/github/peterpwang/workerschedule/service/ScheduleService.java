@@ -9,6 +9,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.github.peterpwang.workerschedule.domain.Schedule;
 
+/**
+ * Schedule service interface
+ * @author Pei Wang
+ *
+ */
 public interface ScheduleService {
 	public Page<Schedule> findAll(Pageable pageable);
 

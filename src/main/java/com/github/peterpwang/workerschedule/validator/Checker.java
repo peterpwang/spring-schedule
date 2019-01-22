@@ -1,5 +1,9 @@
 package com.github.peterpwang.workerschedule.validator;
 
+/**
+ * Service side validation checker
+ * @author Pei Wang
+ */
 public class Checker {
 
 	public static boolean checkEmpty(String input) {

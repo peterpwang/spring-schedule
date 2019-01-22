@@ -13,6 +13,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 
+/**
+ * Manager class (for management and log in)
+ * @author Pei Wang
+ *
+ */
 @Data
 @ToString(exclude = "password")
 @Entity

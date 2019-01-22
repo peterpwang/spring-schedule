@@ -11,6 +11,11 @@ import org.springframework.stereotype.Component;
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
 
+/**
+ * User detail service for user/password authorization
+ * @author Pei Wang
+ *
+ */
 @Component
 public class SpringDataJpaUserDetailsService implements UserDetailsService {
 

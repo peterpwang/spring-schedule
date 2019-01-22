@@ -14,6 +14,10 @@ import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.repository.ScheduleRepository;
 import com.github.peterpwang.workerschedule.repository.UserRepository;
 
+/**
+ * Schedule service implementation class
+ * @author Pei Wang
+ */
 @Service
 @Transactional
 public class ScheduleServiceImpl implements ScheduleService {
