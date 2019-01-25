@@ -261,12 +261,17 @@ class UserApp extends React.Component {
 			this.links = userCollection.entity._links;
 			this.page = userCollection.entity.page;
 
-			return userCollection.entity._embedded.users.map(user => {
-				return client({
-					method: 'GET',
-					path: user._links.self.href
-				})
-			});
+			if (userCollection.entity._embedded != undefined && userCollection.entity._embedded.users != undefined) {
+				return userCollection.entity._embedded.users.map(user => {
+					return client({
+						method: 'GET',
+						path: user._links.self.href
+					})
+				});
+			}
+			else {
+				return Promise.reject('No data found');
+			}
 		}).then(userPromises => {
 			return when.all(userPromises);
 		}).then(users => {
@@ -276,6 +281,14 @@ class UserApp extends React.Component {
 				attributes: Object.keys(this.schema.properties),
 				pageSize: this.state.pageSize,
 				links: this.links
+			});
+		}).catch(e => {
+			this.setState({
+				page: 1, 
+				users: [], 
+				attributes: [],
+				pageSize: this.state.pageSize,
+				links: {}
 			});
 		});
 	}

@@ -264,12 +264,17 @@ class ScheduleApp extends React.Component {
 			this.links = scheduleCollection.entity._links;
 			this.page = scheduleCollection.entity.page;
 
-			return scheduleCollection.entity._embedded.scheduleResources.map(schedule => {
-				return client({
-					method: 'GET',
-					path: schedule._links.self.href
-				})
-			});
+			if (scheduleCollection.entity._embedded != undefined && scheduleCollection.entity._embedded.scheduleResources != undefined) {
+				return scheduleCollection.entity._embedded.scheduleResources.map(schedule => {
+					return client({
+						method: 'GET',
+						path: schedule._links.self.href
+					})
+				});
+			}
+			else {
+				return Promise.reject('No data found');
+			}
 		}).then(schedulePromises => {
 			return when.all(schedulePromises);
 		}).then(schedules => {
@@ -279,6 +284,14 @@ class ScheduleApp extends React.Component {
 				attributes: scheduleAttributes,
 				pageSize: this.state.pageSize,
 				links: this.links
+			});
+		}).catch(e => {
+			this.setState({
+				page: 1, 
+				schedules: [],
+				attributes: scheduleAttributes,
+				pageSize: this.state.pageSize,
+				links: {}
 			});
 		});
 	}
