@@ -533,8 +533,8 @@ class CreateDialog extends React.Component {
 	render() {
 		let options;
 		if (this.props.users != undefined) {
-			options = this.props.users.map((user, index) => 
-				<option value={user.id}>{user.name}</option>
+			options = this.props.users.map((user) =>
+				<option key={"usercreate" + user.id} value={user.id}>{user.name}</option>
 			);
 		}
 
@@ -612,7 +612,7 @@ class UpdateDialog extends React.Component {
 	handleActiveChange(e) {
 		e.preventDefault();
 		
-	  this.setState({active: e.target.value});
+	    this.setState({active: e.target.value});
 	};
 
 	handleUserChange(e) {
@@ -653,8 +653,8 @@ class UpdateDialog extends React.Component {
 	render() {
 		let options;
 		if (this.props.users != undefined) {
-			options = this.props.users.map((user, index) => 
-				<option value={user.id}>{user.name}</option>
+			options = this.props.users.map((user) => 
+				<option key={"userupdate" + user.id} value={user.id}>{user.name}</option>
 			);
 		}
 
