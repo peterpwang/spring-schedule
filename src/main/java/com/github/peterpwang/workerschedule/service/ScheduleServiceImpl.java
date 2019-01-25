@@ -32,6 +32,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 	public Page<Schedule> findAll(Pageable pageable) {
 		return scheduleRepository.findAll(pageable);
 	}
+	
+	public Page<Schedule> findByNameIgnoreCaseContaining(Pageable pageable, String name)
+	{
+		return scheduleRepository.findByNameIgnoreCaseContaining(pageable, name);
+	}
 
 	public Optional<Schedule> findById(Long id) {
 		return scheduleRepository.findById(id);

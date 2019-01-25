@@ -2,7 +2,7 @@
 A web application and a background server for mobile for booking workers schedule.
 
 Technical stacks:
-1. Basic CURD: Spring Data Rest, Hibernate, JPA, Mysql, JSon, ReactJS, HTML5, CSS.
+1. Basic CRUD: Spring Data Rest, Hibernate, JPA, Mysql, JSon, ReactJS, HTML5, CSS.
 2. Spring Security.
 3. Support CRSF.
 4. Server side validation: Event handler.

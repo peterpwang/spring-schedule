@@ -8,6 +8,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 const root = '/api';
 const schedulePath = 'schedules';
+const scheduleByNamePath = 'schedulesByName';
 const userPath = 'users';
 const scheduleAttributes = ["name", "description", "active", "user"]; //, "dateSchedule", "timeStart", "timeEnd"];
 
@@ -20,6 +21,7 @@ class ScheduleApp extends React.Component {
 			attributes: scheduleAttributes, 
 			page: 1, 
 			pageSize: 10, 
+			searchKeyword: undefined,
 			links: {}, 
 			users: [],
 			loggedInManager: this.props.loggedInManager, 
@@ -31,6 +33,7 @@ class ScheduleApp extends React.Component {
 		this.onNavigate = this.onNavigate.bind(this);
 		this.refreshCurrentPage = this.refreshCurrentPage.bind(this);
 		this.refreshAndGoToLastPage = this.refreshAndGoToLastPage.bind(this);
+		this.searchByName = this.searchByName.bind(this);
 		
 		if(cookies.get('XSRF-TOKEN')) {
 			this.state.csrfToken = cookies.get('XSRF-TOKEN');
@@ -64,15 +67,23 @@ class ScheduleApp extends React.Component {
 							onUpdate={this.onUpdate}
 							onDelete={this.onDelete}
 							updatePageSize={this.updatePageSize}
+							searchByName={this.searchByName}
 							loggedInManager={this.state.loggedInManager}/>
 			</div>
 		)
 	}
 	
 	loadFromServer(pageSize) {
+		loadFromServer(pageSize, undefined);
+	}
+	
+	loadFromServer(pageSize, name) {
+		const path = (name == undefined || name.length == 0) ? schedulePath : scheduleByNamePath;
+		const nameParam = (name == undefined || name.length == 0) ? '' : '&name=' + name;
+		
 		client({                                           // 1. visit schedules link with size parameter
 			method: 'GET',
-			path: root + "/" + schedulePath + "?size=" + pageSize,
+			path: root + "/" + path + "?size=" + pageSize + nameParam,
 			headers: {'Accept': 'application/hal+json'}
 		}).then(scheduleCollection => {
 				this.links = scheduleCollection.entity._links;
@@ -97,7 +108,8 @@ class ScheduleApp extends React.Component {
 				links: this.links,
 				page: this.page,
 				schedules: schedules,
-				pageSize: pageSize
+				pageSize: pageSize,
+				searchKeyword: name
 			});
 		});
 	}
@@ -295,6 +307,37 @@ class ScheduleApp extends React.Component {
 			});
 		});
 	}
+	
+	searchByName(name) {
+		if (name !== this.state.searchKeyword) {
+			this.loadFromServer(this.state.pageSize, name);
+		}
+	}
+}
+
+class SearchForm extends React.Component{
+
+	constructor(props) {
+		super(props);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+	
+	handleSubmit(e) {
+		e.preventDefault();
+		const name = ReactDOM.findDOMNode(this.refs.name).value;
+		if (name != undefined && name.length > 0) {
+			this.props.searchByName(name);
+		}
+	}
+
+	render() {
+		return (
+			<form ref="form">
+				Search for: <input ref="name" defaultValue={this.props.searchKeyword} onSubmit={this.handleSubmit}/>
+			    <input type="submit" className="btn btn-light" key="searchname" onClick={this.handleSubmit} value="Search"/>
+  		    </form>
+		)
+	}
 }
 
 class ScheduleList extends React.Component{
@@ -373,6 +416,7 @@ class ScheduleList extends React.Component{
 			<div>
                 {pageInfo}
 				<p><input ref="pageSize" defaultValue={this.props.pageSize} onInput={this.handleInput}/> schedules per page</p>
+				<SearchForm searchByName={this.props.searchByName}/>
 				<table className="table">
 					<tbody>
 						<tr>
@@ -566,10 +610,14 @@ class UpdateDialog extends React.Component {
 	}
 
 	handleActiveChange(e) {
+		e.preventDefault();
+		
 	  this.setState({active: e.target.value});
 	};
 
 	handleUserChange(e) {
+		e.preventDefault();
+		
 		this.setState({selectedUser: e.target.value});
 	};
 

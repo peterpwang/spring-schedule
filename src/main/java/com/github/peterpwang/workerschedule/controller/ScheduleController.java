@@ -81,6 +81,29 @@ public class ScheduleController {
 	}
 
 	/**
+	 * Find schedule list by Name
+	 * @param pageable
+	 * @param name
+	 * @param assembler
+	 * @return ResponseEntity
+	 */
+	@GetMapping(value = "/schedulesByName", produces = "application/hal+json")
+	public ResponseEntity<PagedResources<ScheduleResource>> findSchedule(Pageable pageable, String name,
+			PagedResourcesAssembler assembler) {
+		Page<Schedule> schedules = service.findByNameIgnoreCaseContaining(pageable, name);
+
+		PagedResources<ScheduleResource> resources = assembler.toResource(schedules, new ScheduleResourceAssembler());
+		resources.removeLinks();
+		resources.add(ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/schedulesByName").withRel("self"));
+
+		List<Link> links = createLinks(schedules, "page", "size");
+		resources.add(links);
+
+		HttpHeaders responseHeaders = new HttpHeaders();
+		return new ResponseEntity<>(resources, responseHeaders, HttpStatus.OK);
+	}
+
+	/**
 	 * New schedule
 	 * @param newSchedule
 	 * @return Schedule
