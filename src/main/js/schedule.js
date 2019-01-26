@@ -44,7 +44,7 @@ class ScheduleApp extends React.Component {
 			method: 'GET',
 			path: root + "/" + userPath,
 			headers: {'Accept': 'application/hal+json'}
-		}).done(userCollection => {
+		}).then(userCollection => {
 			this.state.users = userCollection.entity._embedded.users;                               // 2. save users
 		});
 	}
@@ -99,17 +99,24 @@ class ScheduleApp extends React.Component {
 				);
 			}
 			else {
-				return [];
+				return Promise.reject('No schedules data found');
 			}
 		}).then(schedulePromises => {
 			return when.all(schedulePromises);
-		}).done(schedules => {
+		}).then(schedules => {
 			this.setState({                               // 3. save schedules, fields, size, paging links
 				links: this.links,
 				page: this.page,
 				schedules: schedules,
 				pageSize: pageSize,
 				searchKeyword: name
+			});
+		}).catch(e => {
+			this.setState({
+				links: {},
+				page: 1, 
+				schedules: [],
+				pageSize: this.state.pageSize
 			});
 		});
 	}
@@ -121,7 +128,7 @@ class ScheduleApp extends React.Component {
 			}
 		});
 
-		follow(client, root, [{rel: 'schedules'}]).done(response => {
+		follow(client, root, [{rel: 'schedules'}]).then(response => {
 			client({
 				method: 'POST',
 				path: response.entity._links.self.href,
@@ -131,13 +138,13 @@ class ScheduleApp extends React.Component {
 					'Content-Type': 'application/json',
 					'X-XSRF-TOKEN': this.state.csrfToken
 				}
-			}).done(response => {
+			}).then(response => {
 				/* refresh and go to last page */
 				this.refreshAndGoToLastPage();
 
 				// Hide the dialog
 				$('#createSchedule').modal('hide');
-			}, response => {
+			}).catch(response => {
 				if (response.status.code === 403) {
 					alert('ACCESS DENIED: You are not authorized to update.');
 				} 
@@ -165,12 +172,12 @@ class ScheduleApp extends React.Component {
 					'If-Match': schedule.headers.Etag,
 					'X-XSRF-TOKEN': this.state.csrfToken
 				}
-			}).done(response => {
+			}).then(response => {
 				/* Refresh current page */
 				this.refreshCurrentPage();
 				// Hide the dialog
 				$('#update_' + index).modal('hide');
-			}, response => {
+			}).catch(response => {
 				if (response.status.code === 403) {
 					alert('ACCESS DENIED: You are not authorized to update ' +
 						schedule.entity._links.self.href);
@@ -201,22 +208,21 @@ class ScheduleApp extends React.Component {
 				'If-Match': schedule.headers.Etag,
 				'X-XSRF-TOKEN': this.state.csrfToken
 			}
-		}).done(response => {
-				/* Refresh current page */
-				this.refreshCurrentPage();
-			},
-			response => {
-				if (response.status.code === 403) {
-					alert('ACCESS DENIED: You are not authorized to delete ' +
-						schedule.entity._links.self.href);
-				}
-				else if (response.status.code === 500) {
-					alert('Server error. ' + schedule.entity._links.self.href);
-				}
-				else if (response.status.code === 400) {
-					alert('Invalid data: ' + response.entity);
-				}
-			});
+		}).then(response => {
+			/* Refresh current page */
+			this.refreshCurrentPage();
+		}).catch(response => {
+			if (response.status.code === 403) {
+				alert('ACCESS DENIED: You are not authorized to delete ' +
+					schedule.entity._links.self.href);
+			}
+			else if (response.status.code === 500) {
+				alert('Server error. ' + schedule.entity._links.self.href);
+			}
+			else if (response.status.code === 400) {
+				alert('Invalid data: ' + response.entity);
+			}
+		});
 	}
 	
 	onNavigate(navUri) {
@@ -235,7 +241,7 @@ class ScheduleApp extends React.Component {
 			);
 		}).then(schedulePromises => {
 			return when.all(schedulePromises);
-		}).done(schedules => {
+		}).then(schedules => {
 			this.setState({
 				page: this.page,
 				schedules: schedules,
@@ -256,7 +262,7 @@ class ScheduleApp extends React.Component {
 		follow(client, root, [{
 			rel: 'schedules',
 			params: {size: this.state.pageSize}
-		}]).done(response => {
+		}]).then(response => {
 			if (response.entity._links.last !== undefined) {
 				this.onNavigate(response.entity._links.last.href);
 			} else {
