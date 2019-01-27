@@ -1,0 +1,181 @@
+﻿spring framework
+spring mvc
+hibernate
+javascript
+reactJS
+html5
+css/sass/scss
+maven
+git
+junit
+database
+tdd
+restful API
+
+jenkins
+docker
+microservice
+kubernetes
+kafka
+
+
+
+1. Basic CURD: Spring Data Rest, Hibernate, JPA, Mysql, reactJS, html5, CSS. --- OK
+2. Spring Security. --- OK
+3. Support CRSF. --- OK
+4. Server side validation: Event handler. --- OK
+5. Client side validation. --- OK
+6. Add bootstrap, popper and JQuery. --- OK
+7. Add service layer for another table. --- OK
+8. Add reactjs-router. --- OK
+9. Move to H2. --- OK
+10. Testcase. --- OK
+11. Break then chain. --- OK
+12. Search box. --- OK
+13. Microservices.
+14. Docker. 
+
+
+Spring Security:
+1. Write class SpringDataJpaUserDetailsService implements UserDetailsService
+2. Override loadUserByUsername to retrieve manager from database and transfer to a UserDetail object.
+3. Write class SecurityConfiguration extends WebSecurityConfigurerAdapter which uses SpringDataJpaUserDetailsService
+4. Override configure(AuthenticationManagerBuilder auth) to use SpringDataJpaUserDetailsService.
+5. Override configure(HttpSecurity http) to set rules and pages for login.
+6. Set forms: .formLogin().loginPage("/login").failureUrl("/login-error");
+
+
+2018-12-29 16:43:03.407 ERROR 6992 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Exception during pool initialization.
+java.sql.SQLException: The server time zone value '???÷???????±' is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the serverTimezone configuration property) to use a more specifc time zone value if you want to utilize time zone support.
+--- Add parameters for JDBC URL. Fixed.
+
+
+2018-12-29 20:29:21.328 ERROR 5652 --- [nio-8080-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Circular view path [index]: would dispatch back to the current handler URL [/index] again. Check your ViewResolver setup! (Hint: This may be the result of an unspecified view, due to default view name generation.)] with root cause
+javax.servlet.ServletException: Circular view path [index]: would dispatch back to the current handler URL [/index] again. Check your ViewResolver setup! (Hint: This may be the result of an unspecified view, due to default view name generation.)
+        at org.springframework.web.servlet.view.InternalResourceView.prepareForRendering(InternalResourceView.java:209) ~[spring-webmvc-5.1.3.RELEASE.jar!/:5.1.3.RELEASE]
+--- Add thymeleaf into pom.xml. Fixed.
+
+
+java.sql.SQLSyntaxErrorException: Table 'workerschedule.hibernate_sequence' doesn't exist
+--- spring.jpa.properties.hibernate.id.new_generator_mappings=false. Fixed.
+
+
+Caused by: java.sql.SQLSyntaxErrorException: Table 'workerschedule.user' doesn't exist
+--- create it. Fixed.
+
+
+HibernateException: The database returned no natively generated identity value
+--- primary key must be auto_increment. Fixed.
+
+
+Version field
+--- create it manually. Fixed.
+
+
+Warning: Encountered two children with the same key, `2`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+--- Add different id for components (in form). Fixed.
+
+
+Module not found: Error: Can't resolve 'net' in 'D:\code\workers-schedule\node_modules\stompjs\lib
+--- npm i net -S . Fixed.
+
+
+ 'dependencies.dependency.version' for org.thymeleaf.extras:thymeleaf-extras-springsecurity4:jar is missing
+ --- Add version into springsecurity4. Fixed.
+ 
+ 
+Exception processing template "index": An error happened during template parsing (template: "class path resource [templates/index.html]")
+ Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Exception evaluating SpringEL expression: "#authentication.name" (template: "index" - line 10, col 33)
+ org.springframework.expression.spel.SpelEvaluationException: EL1007E: Property or field 'name' cannot be found on null
+--- Change to sec:authentication="name" and upgrade to thymeleaf-extras-springsecurity5. Fixed. 
+ 
+React.js - Syntax error: this is a reserved word in render() function
+--- Change { {this...} } to { <div>{this...}</div> }. Fixed.
+
+
+Text nodes cannot appear as a child of tr
+--- Set showing value into state in constructor and show the state in render function. Fixed.
+
+
+/api/users create: 403 error: -- error: "Forbidden" -- message: "Forbidden" -- WARNING: non-Error used
+--- csrf made it. close it. Fixed. But csrf is needed for security reason. Turn it on and add csrf input in form.
+
+
+React.createElement: type is invalid -- expected a string or a class/function but got
+--- Change import {CookiesProvider} from 'universal-cookie'; to import CookiesProvider from 'universal-cookie'; Fixed.
+
+
+Refused to apply style from 'http://localhost:8080/login' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled.
+--- Add <base href="/"> in login.html. Not working. The reason is css file is wrongly configured to need to login as well
+
+
+Invalid property 'passwordRepeat' of bean class [com.github.peterpwang.workerschedule.domain.User]: Bean property 'passwordRepeat' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
+at com.github.peterpwang.workerschedule.validator.UserValidator.validate(UserValidator.java:35)
+--- Maybe caused by @Transient on passwordRepeat property. Change errors.rejectValue("passwordRepeat" to errors.rejectValue("password".
+
+
+Delete causes 403 error.
+--- Removing UserRepository can't solve it. Add credentials: 'include' in app.js. Fixed.
+
+
+Html validation not working.
+--- Only submit can trigger html5 validation. Fuction submit() doesn't. Fixed.
+
+
+Server validator doesn't show message. only keys.
+--- No messageSource in SpringBootApplication. Add it into a configuration class. ApplicationContext is needed to convert keys to strings. Fixed.
+
+
+Could not find acceptable representation. HTTP 406. HttpMediaTypeNotAcceptableException.
+--- Change in Controller: produces = "application/hal+json" Fixed.
+
+
+forEach is not a function
+--- Uninitialised array is used. Remove it. Fixed.
+
+
+Json root name is "scheduleResources" instead of "schedules"
+--- Changed JS to use schedules. Fixed.
+
+
+Schedule object link error: /api/1
+--- Delete old links and create new links. Fixed.
+
+
+Select has no default value.
+--- Add an additional option with value="" and HTML5 validator. Fixed.
+--- Existing value only contains name not id nor Uri.
+
+
+org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing : com.github.peterpwang.workerschedule.domain.Schedule.user -> com.github.peterpwang.workerschedule.domain.User;
+--- The reason is id not presented. Add RepositoryConfiguration to add id into JSon.
+--- In service, search User by id and re-set User into Schedule. Fixed.
+--- Adding id collides with User module as User module is a Rest Data module which uses URI instead of id. Add id into js. Fixed.
+
+
+Failed to evaluate expression '@scheduleRepository.findById(#id)?.manager?.name == authentication?.name'
+--- This works for Spring Data Rest.
+--- Remove PreAuthorize method annotation and implement in Service function. Fixed.
+
+
+WebSocket not working for Spring MVC
+--- This function is in rest data package. Calling refresh functions instead. Fixed.
+
+
+No permission to edit user or scheduleRepository
+--- LoggedInManager is not passed to UserApp or ScheduleApp from App. Use render instead of components. Fixed.
+
+
+Warning: Each child in an array or iterator should have a unique "key" prop.
+--- Add key to update options. All options disappear.
+--- Remove {} after map. 
+--- Add key={"usercreate" + user.id}. Fixed.
+
+
+Uncaught Error: Target container is not a DOM element.
+--- React bug?
+
+
+Blank page error.
+--- return [] if there is no data. Fixed.
+
