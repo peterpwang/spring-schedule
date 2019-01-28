@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -34,6 +35,7 @@ import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.Schedule;
 import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
+import com.github.peterpwang.workerschedule.repository.UserRepository;
 import com.github.peterpwang.workerschedule.service.ScheduleService;
 
 import lombok.Data;
@@ -54,6 +56,9 @@ public class ScheduleController {
 	@Autowired
 	private ManagerRepository managerRepository;
 
+	@Autowired
+	private UserRepository userRepository;
+
 	public ScheduleController(ScheduleService service) {
 		this.service = service;
 	}
@@ -73,7 +78,7 @@ public class ScheduleController {
 		resources.removeLinks();
 		resources.add(ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/schedules").withRel("self"));
 
-		List<Link> links = createLinks(schedules, "page", "size");
+		List<Link> links = createPageLinks(schedules, "page", "size");
 		resources.add(links);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
@@ -96,11 +101,27 @@ public class ScheduleController {
 		resources.removeLinks();
 		resources.add(ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/schedulesByName").withRel("self"));
 
-		List<Link> links = createLinks(schedules, "page", "size");
+		List<Link> links = createPageLinks(schedules, "page", "size");
 		resources.add(links);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		return new ResponseEntity<>(resources, responseHeaders, HttpStatus.OK);
+	}
+
+	/**
+	 * Find user list
+	 * @param assembler
+	 * @return ResponseEntity
+	 */
+	@GetMapping(value = "/availableUsers", produces = "application/hal+json")
+	public ResponseEntity<Resources<User>> findAvailableUsers() {
+		// Todo: Call UserService
+		Iterable<User> users = userRepository.findAll();
+		
+		Link self = ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/availableUsers").withRel("self");
+		Resources<User> userResources = new Resources(users, self);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		return new ResponseEntity<>(userResources, responseHeaders, HttpStatus.OK);
 	}
 
 	/**
@@ -112,6 +133,7 @@ public class ScheduleController {
 	public Schedule newSchedule(@Valid @RequestBody Schedule newSchedule) {
 
 		applyScheduleInformationUsingSecurityContext(newSchedule);
+		System.out.println("Security applied: " + newSchedule.getManager().getName());
 		return service.save(newSchedule);
 	}
 
@@ -183,7 +205,7 @@ public class ScheduleController {
 	 * @param sizeParam
 	 * @return List<Link>
 	 */
-	public static <T> List<Link> createLinks(Page<T> page, String pageParam, String sizeParam) {
+	public static <T> List<Link> createPageLinks(Page<T> page, String pageParam, String sizeParam) {
 		List<Link> links = new LinkedList<>();
 		addPreviousLink(links, page, pageParam, sizeParam);
 		addNextLink(links, page, pageParam, sizeParam);

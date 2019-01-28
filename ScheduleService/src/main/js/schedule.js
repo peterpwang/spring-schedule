@@ -9,7 +9,7 @@ const cookies = new Cookies();
 const root = '/api';
 const schedulePath = 'schedules';
 const scheduleByNamePath = 'schedulesByName';
-const userPath = 'users';
+const userPath = 'availableUsers';
 const scheduleAttributes = ["name", "description", "active", "user"]; //, "dateSchedule", "timeStart", "timeEnd"];
 
 class ScheduleApp extends React.Component {
@@ -45,7 +45,7 @@ class ScheduleApp extends React.Component {
 			path: root + "/" + userPath,
 			headers: {'Accept': 'application/hal+json'}
 		}).then(userCollection => {
-			this.state.users = userCollection.entity._embedded.users;                               // 2. save users
+			this.setState({users: userCollection.entity._embedded.users});  // 2. save users
 		});
 	}
 
@@ -123,7 +123,7 @@ class ScheduleApp extends React.Component {
 	
 	onCreate(newSchedule) {
 		this.state.users.forEach(user => {
-			if (user._links.self.href == newSchedule.user) {
+			if (user.id == newSchedule.user) {
 				newSchedule.user = user;
 			}
 		});
