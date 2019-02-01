@@ -1,0 +1,16 @@
+.logout
+{
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+
+.logout form
+{
+	display: inline;
+}
+
+.hiddensubmit {
+	display:none;
+}
+
+	

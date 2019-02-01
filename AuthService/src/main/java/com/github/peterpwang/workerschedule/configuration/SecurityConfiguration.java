@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,9 +21,7 @@ import com.github.peterpwang.workerschedule.service.SpringDataJpaUserDetailsServ
  * @author Pei Wang
  *
  */
-@Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity 	// Enable security config. This annotation denotes config for spring security.
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -46,9 +44,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+					System.out.println("ZZZ user:" + authenticationManager());
+					System.out.println("YYY user:" + jwtConfig);
+
 		http
-			.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Support CSRF in cookies
-				.and()
+			.csrf().disable()
 		    // make sure we use stateless session; session won't be used to store user's state.
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
@@ -56,25 +56,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
 				.and()
 			// Add a filter to validate user credentials and add token in the response header
-			
 		    // What's the authenticationManager()? 
 		    // An object provided by WebSecurityConfigurerAdapter, used to authenticate the user passing user's credentials
 		    // The filter needs this auth manager to authenticate the user.
 		    .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))	
 			.authorizeRequests()
-				.antMatchers("/built/**", "/styles/**", "/ws/**").permitAll()
-				.anyRequest().authenticated()
-				.and()
-			.formLogin()
-				.loginPage("/login")
-				.failureUrl("/login-error")
-				.defaultSuccessUrl("/", true)
-				.permitAll()
-				.and()
-			.httpBasic()
-				.and()
-			.logout()
-				.logoutSuccessUrl("/");
+				// allow all POST requests
+				.antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
+				// any other requests must be authenticated
+				.anyRequest().authenticated();
 	}
 	
 	@Bean
