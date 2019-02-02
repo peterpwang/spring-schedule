@@ -25,11 +25,11 @@ class App extends React.Component {
 		  <div>
 			<Switch>
 			  <Route exact path='/' render={() => {
-				  return (<LoginContext.Provider value={this.state}><LoginApp/></LoginContext.Provider>);
+				  return (<LoginContext.Provider value={this.state}><LoginApp props={this.props}/></LoginContext.Provider>);
 				}
 			  }/>
-			  <Route exact path='/profile' render={() => {
-				  return (<div><Header/><main><LoginContext.Provider value={this.state}><ProfileApp/></LoginContext.Provider></main></div>);
+			  <Route path='/profile' render={() => {
+				  return (<div><Header/><main><LoginContext.Provider value={this.state}><ProfileApp props={this.props}/></LoginContext.Provider></main></div>);
 				}
 			  }/>
 			  <Route path='/users' render={() => {
@@ -55,21 +55,24 @@ class App extends React.Component {
 class Header extends React.Component {
 	render() {
 		return (
-			<header>
-				<nav>
-				  <ul className="nav nav-tabs">
-					<li className="nav-item">
-					  <Link className="nav-link" to="/profile">Home</Link>
-					</li>
-					<li className="nav-item">
-					  <Link className="nav-link" to="/users">User</Link>
-					</li>
-					<li className="nav-item">
-					  <Link className="nav-link" to="/schedules">Schedule</Link>
-					</li>
-				  </ul>
-				</nav>
-			</header>
+			<div>
+				<div>Worker's Schedule</div>
+				<header>
+					<nav>
+					  <ul className="nav nav-tabs">
+						<li className="nav-item">
+						  <Link className="nav-link" to="/profile">Home</Link>
+						</li>
+						<li className="nav-item">
+						  <Link className="nav-link" to="/users">User</Link>
+						</li>
+						<li className="nav-item">
+						  <Link className="nav-link" to="/schedules">Schedule</Link>
+						</li>
+					  </ul>
+					</nav>
+				</header>
+			</div>
 		)
 	}
 }

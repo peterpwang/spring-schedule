@@ -1,6 +1,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
+import {withRouter} from 'react-router-dom';
 import LoginContext from './logincontext';
 
 class LoginApp extends React.Component {
@@ -95,6 +96,6 @@ class LoginForm extends React.Component {
 	}
 }
 
-LoginApp.contextType = LoginContext; // This part is important to access context values
+export default withRouter(LoginApp);
 
-export default LoginApp;
+LoginApp.contextType = LoginContext; // This part is important to access context values
