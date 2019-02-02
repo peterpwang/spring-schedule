@@ -3,19 +3,13 @@ const ReactDOM = require('react-dom');
 const when = require('when');
 const client = require('./client');
 const follow = require('./follow');
-import Cookies from 'universal-cookie';
-
-const root = '/api';
-const cookies = new Cookies();
-var stompClient = require('./websocket-listener')
+import LoginContext from './logincontext';
 
 class LoginApp extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
-			loggedInManager: this.props.loggedInManager,
-			authorization: undefined,
 			loginError: undefined
 		};
 		this.onLogin = this.onLogin.bind(this);
@@ -23,11 +17,11 @@ class LoginApp extends React.Component {
 	}
 
 	render() {
-		if (this.state.authorization == undefined) {
+		if (this.context.authorization == undefined) {
 			return (<LoginForm onLogin={this.onLogin} loginError={this.state.loginError} />);
 		}
 		else {
-			return (<LogoutForm onLogout={this.onLogout} loggedInManager={this.props.loggedInManager} />);
+			return (<LogoutForm onLogout={this.onLogout}/>);
 		}
 	}
 
@@ -40,7 +34,7 @@ class LoginApp extends React.Component {
 				'Content-Type': 'application/json'
 			}
 		}).done(response => {
-			this.setState({'loggedInManager': response.headers['LoggedInUser'], 'authorization':  response.headers['Authorization']});
+			this.context.toggleLogin(response.headers['Authorization']);
 		}, response => {
 			if (response.status.code === 403) {
 				alert('ACCESS DENIED: You are not authorized.');
@@ -62,7 +56,7 @@ class LoginApp extends React.Component {
 				'Content-Type': 'application/json'
 			}
 		}).done(response => {
-			this.setState({'loggedInManager': null, 'authorization': null});
+			this.context.toggleLogin(null);
 		}, response => {
 			if (response.status.code === 403) {
 				alert('ACCESS DENIED: You are not authorized to update.');
@@ -151,4 +145,6 @@ class LogoutForm extends React.Component {
 	}
 }
 	
+LoginApp.contextType = LoginContext; // This part is important to access context values
+
 export default LoginApp;
