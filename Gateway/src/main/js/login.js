@@ -1,8 +1,6 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
-const when = require('when');
 const client = require('./client');
-const follow = require('./follow');
 import LoginContext from './logincontext';
 
 class LoginApp extends React.Component {
@@ -13,16 +11,10 @@ class LoginApp extends React.Component {
 			loginError: undefined
 		};
 		this.onLogin = this.onLogin.bind(this);
-		this.onLogout = this.onLogout.bind(this);
 	}
 
 	render() {
-		if (this.context.authorization == undefined) {
-			return (<LoginForm onLogin={this.onLogin} loginError={this.state.loginError} />);
-		}
-		else {
-			return (<LogoutForm onLogout={this.onLogout}/>);
-		}
+		return (<LoginForm onLogin={this.onLogin} loginError={this.state.loginError} />);
 	}
 
 	onLogin(login) {
@@ -35,6 +27,7 @@ class LoginApp extends React.Component {
 			}
 		}).done(response => {
 			this.context.toggleLogin(response.headers['Authorization']);
+			this.props.history.push('/profile'); //Redirected to profile page
 		}, response => {
 			if (response.status.code === 403) {
 				alert('ACCESS DENIED: You are not authorized.');
@@ -44,25 +37,6 @@ class LoginApp extends React.Component {
 			}
 			else if (response.status.code === 400) {
 				alert('Invalid data: ' + response.entity);
-			}
-		});
-	}
-
-	onLogout(logout) {
-		client({
-			method: 'POST',
-			path: '/logout',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).done(response => {
-			this.context.toggleLogin(null);
-		}, response => {
-			if (response.status.code === 403) {
-				alert('ACCESS DENIED: You are not authorized to update.');
-			} 
-			else if (response.status.code === 500) {
-				alert('Server error.');
 			}
 		});
 	}
@@ -121,30 +95,6 @@ class LoginForm extends React.Component {
 	}
 }
 
-class LogoutForm extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.onLogoutSubmit = this.onLogoutSubmit.bind(this);
-	}
-
-	render() {
-		return (
-			<div>
-				Hello, <span id="managername">{this.props.loggedInManager}</span>.
-				<form ref="form">
-					<button type="button" className="btn" onClick={this.onLogoutSubmit}>Log out</button>
-				</form>
-			</div>
-		)
-	}
-
-	onLogoutSubmit(e) {
-		e.preventDefault();
-		this.props.onLogout();
-	}
-}
-	
 LoginApp.contextType = LoginContext; // This part is important to access context values
 
 export default LoginApp;

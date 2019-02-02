@@ -3,6 +3,7 @@ const ReactDOM = require('react-dom');
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 
 import LoginApp from './login'; 
+import ProfileApp from './profile'; 
 import ScheduleApp from './schedule'; 
 import UserApp from './user'; 
 import LoginContext from './logincontext';
@@ -25,6 +26,10 @@ class App extends React.Component {
 			<Switch>
 			  <Route exact path='/' render={() => {
 				  return (<LoginContext.Provider value={this.state}><LoginApp/></LoginContext.Provider>);
+				}
+			  }/>
+			  <Route exact path='/profile' render={() => {
+				  return (<div><Header/><main><LoginContext.Provider value={this.state}><ProfileApp/></LoginContext.Provider></main></div>);
 				}
 			  }/>
 			  <Route path='/users' render={() => {
@@ -54,7 +59,7 @@ class Header extends React.Component {
 				<nav>
 				  <ul className="nav nav-tabs">
 					<li className="nav-item">
-					  <Link className="nav-link" to="/">Home</Link>
+					  <Link className="nav-link" to="/profile">Home</Link>
 					</li>
 					<li className="nav-item">
 					  <Link className="nav-link" to="/users">User</Link>
