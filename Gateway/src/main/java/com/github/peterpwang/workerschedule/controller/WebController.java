@@ -14,22 +14,6 @@ public class WebController {
 
 	@RequestMapping(value = "/")
 	public String index() {
-		return "login";
-	}
-
-	@RequestMapping("/login")
-	public String login() {
-		return "login";
-	}
-
-	@RequestMapping("/login-error")
-	public String loginError(Model model) {
-		model.addAttribute("loginError", true);
-		return "login";
-	}
-
-	@RequestMapping("/auth")
-	public String auth() {
 		return "index";
 	}
 }

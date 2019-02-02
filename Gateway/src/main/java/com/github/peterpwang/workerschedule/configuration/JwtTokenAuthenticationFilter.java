@@ -2,6 +2,8 @@ package com.github.peterpwang.workerschedule.configuration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -31,7 +33,7 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 		
 		// 1. get the authentication header. Tokens are supposed to be passed in the authentication header
 		String header = request.getHeader(jwtConfig.getHeader());
-		
+
 		// 2. validate the header and check the prefix
 		if(header == null || !header.startsWith(jwtConfig.getPrefix())) {
 			chain.doFilter(request, response);  		// If not valid, go to the next filter.
@@ -69,6 +71,7 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 				 // 6. Authenticate the user
 				 // Now, user is authenticated
 				 SecurityContextHolder.getContext().setAuthentication(auth);
+				 response.setHeader("LoggedInUser", username);
 			}
 			
 		} catch (Exception e) {

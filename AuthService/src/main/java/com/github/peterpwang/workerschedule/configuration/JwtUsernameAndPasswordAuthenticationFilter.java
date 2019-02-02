@@ -44,18 +44,20 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		
-		// 1. Get credentials from request
-		//UserCredentials creds = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
-		UserCredentials creds = new UserCredentials();
-		creds.setUsername(request.getParameter("username"));
-		creds.setPassword(request.getParameter("password"));
+		try {
+			// 1. Get credentials from request
+			UserCredentials creds = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
 
-		// 2. Create auth object (contains credentials) which will be used by auth manager
-		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-				creds.getUsername(), creds.getPassword(), Collections.emptyList());
-		
-		// 3. Authentication manager authenticate the user, and use UserDetialsServiceImpl::loadUserByUsername() method to load the user.
-		return authManager.authenticate(authToken);
+			// 2. Create auth object (contains credentials) which will be used by auth manager
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+					creds.getUsername(), creds.getPassword(), Collections.emptyList());
+			
+			// 3. Authentication manager authenticate the user, and use UserDetialsServiceImpl::loadUserByUsername() method to load the user.
+			return authManager.authenticate(authToken);
+		}
+		catch(IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 	
 	// Upon successful authentication, generate a token.

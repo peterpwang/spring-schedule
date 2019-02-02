@@ -30,13 +30,22 @@ public class SecurityTokenConfiguration extends WebSecurityConfigurerAdapter {
 		   .addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
 		// authorization requests config
 		.authorizeRequests()
-			.antMatchers("/built/**", "/styles/**", "/ws/**", "/login/**", "/logout/**", "/favicon.ico").permitAll()
+			.antMatchers(HttpMethod.GET, "/built/**", "/styles/**", "/ws/**", "/scripts/**", "/", "/favicon.ico").permitAll()
 		    // allow all who are accessing "auth" service
 		    .antMatchers(jwtConfig.getUri()).permitAll()  
 		    // must be an admin if trying to access admin area (authentication is also required here)
 		    .antMatchers("/schedule/**").hasRole("ADMIN")
 		    // Any other request must be authenticated
-		    .anyRequest().authenticated(); 
+		    .anyRequest().authenticated()
+		.and()
+			.formLogin()
+				.loginPage("/index")
+				.failureUrl("/index")
+				.defaultSuccessUrl("/", true)
+				.permitAll()
+		.and()
+			.logout()
+				.logoutSuccessUrl("/");
 	}
 	
 	@Bean
