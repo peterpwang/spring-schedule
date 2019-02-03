@@ -24,7 +24,7 @@ class ProfileApp extends React.Component {
 			}
 		}).done(response => {
 			this.context.toggleLogin(null);
-			this.props.history.push('/login'); //Redirected to login page
+			this.props.history.push('/'); //Redirected to login page
 		}, response => {
 			if (response.status.code === 403) {
 				alert('ACCESS DENIED: You are not authorized to update.');

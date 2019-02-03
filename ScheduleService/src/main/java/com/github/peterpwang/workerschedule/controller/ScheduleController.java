@@ -46,7 +46,7 @@ import lombok.Data;
  *
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/schedules/api")
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class ScheduleController {
 

@@ -11,19 +11,19 @@ import com.github.peterpwang.workerschedule.domain.User;
  * @author Pei Wang
  *
  */
-//@PreAuthorize("hasRole('ROLE_MANAGER')")
+@PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
 	@Override
-	//@PreAuthorize("#user?.manager == null or #user?.manager?.name == authentication?.name")
+	@PreAuthorize("#user?.manager == null or #user?.manager?.name == authentication?.name")
 	User save(@Param("user") User user);
 
 	@Override
-	//@PreAuthorize("@userRepository.findById(#id)?.manager?.name == authentication?.name")
+	@PreAuthorize("@userRepository.findById(#id)?.manager?.name == authentication?.name")
 	void deleteById(@Param("id") Long id);
 
 	@Override
-	//@PreAuthorize("#user?.manager?.name == authentication?.name")
+	@PreAuthorize("#user?.manager?.name == authentication?.name")
 	void delete(@Param("user") User user);
 
 }

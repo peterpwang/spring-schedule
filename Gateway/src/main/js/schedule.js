@@ -2,11 +2,11 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const when = require('when');
 const client = require('./client');
-const follow = require('./follow');
 import Cookies from 'universal-cookie';
+import LoginContext from './logincontext';
 
 const cookies = new Cookies();
-const root = '/api';
+const rootApi = '/schedules/api';
 const schedulePath = 'schedules';
 const scheduleByNamePath = 'schedulesByName';
 const userPath = 'availableUsers';
@@ -38,18 +38,18 @@ class ScheduleApp extends React.Component {
 		if(cookies.get('XSRF-TOKEN')) {
 			this.state.csrfToken = cookies.get('XSRF-TOKEN');
 		}
-		
-		// Get all users
-		client({                                           // 1. visit users link
-			method: 'GET',
-			path: root + "/" + userPath,
-			headers: {'Accept': 'application/hal+json'}
-		}).then(userCollection => {
-			this.setState({users: userCollection.entity._embedded.users});  // 2. save users
-		});
 	}
 
 	componentDidMount() {
+		// Get all users
+		client({                                           // 1. visit users link
+			method: 'GET',
+			path: rootApi + "/" + userPath,
+			headers: {'Authorization': this.context.authorization}
+		}).then(userCollection => {
+			this.setState({users: userCollection.entity._embedded.users});  // 2. save users
+		});
+
 		this.loadFromServer(this.state.pageSize);
 	}
 
@@ -83,8 +83,8 @@ class ScheduleApp extends React.Component {
 		
 		client({                                           // 1. visit schedules link with size parameter
 			method: 'GET',
-			path: root + "/" + path + "?size=" + pageSize + nameParam,
-			headers: {'Accept': 'application/hal+json'}
+			path: rootApi + "/" + path + "?size=" + pageSize + nameParam,
+			headers: {'Authorization': this.context.authorization}
 		}).then(scheduleCollection => {
 				this.links = scheduleCollection.entity._links;
 				this.page = scheduleCollection.entity.page;
@@ -94,7 +94,8 @@ class ScheduleApp extends React.Component {
 				return scheduleCollection.entity._embedded.scheduleResources.map(schedule =>
 					client({                              // 2. visit every schedule detail
 						method: 'GET',
-						path: schedule._links.self.href
+						path: schedule._links.self.href,
+						headers: {'Authorization': this.context.authorization}
 					})
 				);
 			}
@@ -128,33 +129,32 @@ class ScheduleApp extends React.Component {
 			}
 		});
 
-		follow(client, root, [{rel: 'schedules'}]).then(response => {
-			client({
-				method: 'POST',
-				path: response.entity._links.self.href,
-				entity: newSchedule,
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-XSRF-TOKEN': this.state.csrfToken
-				}
-			}).then(response => {
-				/* refresh and go to last page */
-				this.refreshAndGoToLastPage();
+		client({
+			method: 'POST',
+			path: rootApi + "/schedules",
+			entity: newSchedule,
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN': this.state.csrfToken,
+				'Authorization': this.context.authorization
+			}
+		}).then(response => {
+			/* refresh and go to last page */
+			this.refreshAndGoToLastPage();
 
-				// Hide the dialog
-				$('#createSchedule').modal('hide');
-			}).catch(response => {
-				if (response.status.code === 403) {
-					alert('ACCESS DENIED: You are not authorized to update.');
-				} 
-				else if (response.status.code === 500) {
-					alert('Server error.');
-				}
-				else if (response.status.code === 400) {
-					alert('Invalid data: ' + response.entity);
-				}
-			});
+			// Hide the dialog
+			$('#createSchedule').modal('hide');
+		}).catch(response => {
+			if (response.status.code === 403) {
+				alert('ACCESS DENIED: You are not authorized to update.');
+			} 
+			else if (response.status.code === 500) {
+				alert('Server error.');
+			}
+			else if (response.status.code === 400) {
+				alert('Invalid data: ' + response.entity);
+			}
 		});
 	}
 	
@@ -170,7 +170,8 @@ class ScheduleApp extends React.Component {
 				headers: {
 					'Content-Type': 'application/json',
 					'If-Match': schedule.headers.Etag,
-					'X-XSRF-TOKEN': this.state.csrfToken
+					'X-XSRF-TOKEN': this.state.csrfToken,
+					'Authorization': this.context.authorization
 				}
 			}).then(response => {
 				/* Refresh current page */
@@ -206,7 +207,8 @@ class ScheduleApp extends React.Component {
 			credentials: 'include',
 			headers: {
 				'If-Match': schedule.headers.Etag,
-				'X-XSRF-TOKEN': this.state.csrfToken
+				'X-XSRF-TOKEN': this.state.csrfToken,
+				'Authorization': this.context.authorization
 			}
 		}).then(response => {
 			/* Refresh current page */
@@ -228,7 +230,10 @@ class ScheduleApp extends React.Component {
 	onNavigate(navUri) {
 		client({
 			method: 'GET', 
-			path: navUri
+			path: navUri,
+			headers: {
+				'Authorization': this.context.authorization
+			}
 		}).then(scheduleCollection => {
 			this.links = scheduleCollection.entity._links;
 			this.page = scheduleCollection.entity.page;
@@ -236,7 +241,8 @@ class ScheduleApp extends React.Component {
 			return scheduleCollection.entity._embedded.scheduleResources.map(schedule =>
 			        client({
 						method: 'GET',
-						path: schedule._links.self.href
+						path: schedule._links.self.href,
+						headers: {'Authorization': this.context.authorization}
 					})
 			);
 		}).then(schedulePromises => {
@@ -259,26 +265,29 @@ class ScheduleApp extends React.Component {
 	}
 	
 	refreshAndGoToLastPage() {
-		follow(client, root, [{
-			rel: 'schedules',
-			params: {size: this.state.pageSize}
-		}]).then(response => {
-			if (response.entity._links.last !== undefined) {
-				this.onNavigate(response.entity._links.last.href);
-			} else {
-				this.onNavigate(response.entity._links.self.href);
-			}
-		})
+		client({
+				method: 'GET', 
+				path: rootApi + '/schedules?size=' + this.state.pageSize,
+				headers: {
+					'Authorization': this.context.authorization
+				}
+			}).then(response => {
+				if (response.entity._links.last !== undefined) {
+					this.onNavigate(response.entity._links.last.href);
+				} else {
+					this.onNavigate(response.entity._links.self.href);
+				}
+			})
 	}
 
 	refreshCurrentPage() {
-		follow(client, root, [{
-			rel: 'schedules',
-			params: {
-				size: this.state.pageSize,
-				page: this.state.page.number
-			}
-		}]).then(scheduleCollection => {
+		client({
+				method: 'GET', 
+				path: rootApi + '/schedules?size=' + this.state.pageSize + '&page=' + this.state.page.number,
+				headers: {
+					'Authorization': this.context.authorization
+				}
+		}).then(scheduleCollection => {
 			this.links = scheduleCollection.entity._links;
 			this.page = scheduleCollection.entity.page;
 
@@ -286,7 +295,8 @@ class ScheduleApp extends React.Component {
 				return scheduleCollection.entity._embedded.scheduleResources.map(schedule => {
 					return client({
 						method: 'GET',
-						path: schedule._links.self.href
+						path: schedule._links.self.href,
+						headers: {'Authorization': this.context.authorization}
 					})
 				});
 			}
@@ -720,5 +730,7 @@ class UpdateDialog extends React.Component {
 		)
 	}
 };
+
+ScheduleApp.contextType = LoginContext; // This part is important to access context values
 
 export default ScheduleApp;

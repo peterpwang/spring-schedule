@@ -3,8 +3,8 @@
 const SockJS = require('sockjs-client');
 require('stompjs');
 
-function register(registrations) {
-	const socket = SockJS('/ws');
+function register(root, registrations) {
+	const socket = SockJS(root + '/ws');
 	const stompClient = Stomp.over(socket);
 	stompClient.connect({}, function(frame) {
 		registrations.forEach(function (registration) {

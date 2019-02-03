@@ -13,4 +13,13 @@ Technical stacks:
 9. ReactJS-Router.
 10. Support to H2.
 11. Test case.
+12. Microservices: Eureka, Zuul.
 
+
+To start the system:
+1. In Registry, run: "mvn spring-boot:run". It runs on port 8761.
+2. In AuthService, run: "mvn spring-boot:run". It runs on port 9100.
+3. In ScheduleService: run: "mvn spring-boot:run". It runs on port 8000.
+4. In UserService: run: "mvn spring-boot:run". It runs on port 8100.
+5. In Gateway: run: "mvn spring-boot:run". It runs on port 8080.
+6. In a browser, visit http://localhost:8080

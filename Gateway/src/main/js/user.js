@@ -2,10 +2,11 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const when = require('when');
 const client = require('./client');
-const follow = require('./follow');
 import Cookies from 'universal-cookie';
+import LoginContext from './logincontext';
 
-const root = '/api';
+const root = '/users';
+const rootApi = root + '/api';
 const cookies = new Cookies();
 var stompClient = require('./websocket-listener')
 
@@ -37,10 +38,10 @@ class UserApp extends React.Component {
 	componentDidMount() {
 		this.loadFromServer(this.state.pageSize);
 		
-		stompClient.register([
-			{route: '/topic/newUser', callback: this.refreshAndGoToLastPage},
-			{route: '/topic/updateUser', callback: this.refreshCurrentPage},
-			{route: '/topic/deleteUser', callback: this.refreshCurrentPage}
+		stompClient.register(root, [
+			{route: '/users/topic/newUser', callback: this.refreshAndGoToLastPage},
+			{route: '/users/topic/updateUser', callback: this.refreshCurrentPage},
+			{route: '/users/topic/deleteUser', callback: this.refreshCurrentPage}
 		]);
 	}
 
@@ -63,13 +64,23 @@ class UserApp extends React.Component {
 	}
 	
 	loadFromServer(pageSize) {
-		follow(client, root, [                            // 1. visit root /api & get information
-			{rel: 'users', params: {size: pageSize}}]     // 2. follow up to visit users link with size parameter /api/users?size=10
-		).then(userCollection => {
+		client({
+			method: 'GET',
+			path: rootApi + '/users?size=' + pageSize,
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN': this.state.csrfToken,
+				'Authorization': this.context.authorization
+			}
+		}).then(userCollection => {
 			return client({                               // 3. visit paging links profile /api/profile/users
 				method: 'GET',
-				path: userCollection.entity._links.profile.href,
-				headers: {'Accept': 'application/schema+json'}
+				path: rootApi + '/profile/users',
+				headers: {
+					'Accept': 'application/schema+json',
+					'Authorization': this.context.authorization
+				}
 			}).then(schema => {                           // 4. pick up schema information from result
 				
 				/**
@@ -95,7 +106,8 @@ class UserApp extends React.Component {
 			return userCollection.entity._embedded.users.map(user =>
 					client({                              // 6. visit every user detail
 						method: 'GET',
-						path: user._links.self.href
+						path: rootApi + '/users/' + user.id,
+						headers: {'Authorization': this.context.authorization}
 					})
 			);
 		}).then(userPromises => {
@@ -112,31 +124,30 @@ class UserApp extends React.Component {
 	}
 	
 	onCreate(newUser) {
-		follow(client, root, ['users']).done(response => {
-			client({
-				method: 'POST',
-				path: response.entity._links.self.href,
-				entity: newUser,
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-XSRF-TOKEN': this.state.csrfToken
-				}
-			}).done(response => {
-				/* Let the websocket handler update the state */
-				// Hide the dialog
-				$('#createUser').modal('hide');
-			}, response => {
-				if (response.status.code === 403) {
-					alert('ACCESS DENIED: You are not authorized to update.');
-				} 
-				else if (response.status.code === 500) {
-					alert('Server error.');
-				}
-				else if (response.status.code === 400) {
-					alert('Invalid data: ' + response.entity);
-				}
-			});
+		client({
+			method: 'POST',
+			path: rootApi + '/users',
+			entity: newUser,
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN': this.state.csrfToken,
+				'Authorization': this.context.authorization
+			}
+		}).done(response => {
+			/* Let the websocket handler update the state */
+			// Hide the dialog
+			$('#createUser').modal('hide');
+		}, response => {
+			if (response.status.code === 403) {
+				alert('ACCESS DENIED: You are not authorized to update.');
+			} 
+			else if (response.status.code === 500) {
+				alert('Server error.');
+			}
+			else if (response.status.code === 400) {
+				alert('Invalid data: ' + response.entity);
+			}
 		});
 	}
 	
@@ -146,13 +157,14 @@ class UserApp extends React.Component {
 			
 			client({
 				method: 'PUT',
-				path: user.entity._links.self.href,
+				path:  rootApi + '/users/' + user.id,
 				entity: updatedUser,
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 					'If-Match': user.headers.Etag,
-					'X-XSRF-TOKEN': this.state.csrfToken
+					'X-XSRF-TOKEN': this.state.csrfToken,
+					'Authorization': this.context.authorization
 				}
 			}).done(response => {
 				/* Let the websocket handler update the state */
@@ -183,11 +195,12 @@ class UserApp extends React.Component {
 	onDelete(user) {
 		client({
 			method: 'DELETE', 
-			path: user.entity._links.self.href,
+			path:  rootApi + '/users/' + user.id,
 			credentials: 'include',
 			headers: {
 				'If-Match': user.headers.Etag,
-				'X-XSRF-TOKEN': this.state.csrfToken
+				'X-XSRF-TOKEN': this.state.csrfToken,
+				'Authorization': this.context.authorization
 			}
 		}).done(response => {/* let the websocket handle updating the UI */},
 			response => {
@@ -207,7 +220,8 @@ class UserApp extends React.Component {
 	onNavigate(navUri) {
 		client({
 			method: 'GET', 
-			path: navUri
+			path: navUri,
+			headers: {'Authorization': this.context.authorization}
 		}).then(userCollection => {
 			this.links = userCollection.entity._links;
 			this.page = userCollection.entity.page;
@@ -215,7 +229,8 @@ class UserApp extends React.Component {
 			return userCollection.entity._embedded.users.map(user =>
 			        client({
 						method: 'GET',
-						path: user._links.self.href
+						path: rootApi + '/users/' + user.id,
+						headers: {'Authorization': this.context.authorization}
 					})
 			);
 		}).then(userPromises => {
@@ -238,26 +253,25 @@ class UserApp extends React.Component {
 	}
 	
 	refreshAndGoToLastPage(message) {
-		follow(client, root, [{
-			rel: 'users',
-			params: {size: this.state.pageSize}
-		}]).done(response => {
+		client({
+			method: 'GET', 
+			path: rootApi + "users?size=" + this.state.pageSize,
+			headers: {'Authorization': this.context.authorization}
+		}).done(response => {
 			if (response.entity._links.last !== undefined) {
 				this.onNavigate(response.entity._links.last.href);
 			} else {
 				this.onNavigate(response.entity._links.self.href);
 			}
-		})
+		});
 	}
 
 	refreshCurrentPage(message) {
-		follow(client, root, [{
-			rel: 'users',
-			params: {
-				size: this.state.pageSize,
-				page: this.state.page.number
-			}
-		}]).then(userCollection => {
+		client({
+			method: 'GET', 
+			path: rootApi + "users?size=" + this.state.pageSize + "&page=" + this.state.page.number,
+			headers: {'Authorization': this.context.authorization}
+		}).then(userCollection => {
 			this.links = userCollection.entity._links;
 			this.page = userCollection.entity.page;
 
@@ -265,7 +279,8 @@ class UserApp extends React.Component {
 				return userCollection.entity._embedded.users.map(user => {
 					return client({
 						method: 'GET',
-						path: user._links.self.href
+						path: rootApi + '/users/' + user.id,
+						headers: {'Authorization': this.context.authorization}
 					})
 				});
 			}
@@ -618,5 +633,7 @@ class UpdateDialog extends React.Component {
 		)
 	}
 };
+
+UserApp.contextType = LoginContext; // This part is important to access context values
 
 export default UserApp;

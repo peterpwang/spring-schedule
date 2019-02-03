@@ -1,7 +1,8 @@
-module.exports = function follow(api, rootPath, relArray) {
+module.exports = function follow(api, rootPath, headers, relArray) {
 	const root = api({
 		method: 'GET',
-		path: rootPath
+		path: rootPath,
+		headers: headers
 	});
 
 	return relArray.reduce(function(root, arrayItem) {
@@ -22,13 +23,15 @@ module.exports = function follow(api, rootPath, relArray) {
 			if (typeof arrayItem === 'string') {
 				return api({
 					method: 'GET',
-					path: response.entity._links[rel].href
+					path: response.entity._links[rel].href,
+					headers: headers
 				});
 			} else {
 				return api({
 					method: 'GET',
 					path: response.entity._links[rel].href,
-					params: arrayItem.params
+					params: arrayItem.params,
+					headers: headers
 				});
 			}
 		});
