@@ -25,19 +25,34 @@ class App extends React.Component {
 		  <div>
 			<Switch>
 			  <Route exact path='/' render={() => {
-				  return (<LoginContext.Provider value={this.state}><LoginApp props={this.props}/></LoginContext.Provider>);
+				  return (<LoginContext.Provider value={this.state}><LoginApp/></LoginContext.Provider>);
 				}
 			  }/>
 			  <Route path='/profile' render={() => {
-				  return (<div><Header/><main><LoginContext.Provider value={this.state}><ProfileApp props={this.props}/></LoginContext.Provider></main></div>);
+				  return (
+				    <div>
+					  <Header/>
+					  <main><LoginContext.Provider value={this.state}><ProfileApp/></LoginContext.Provider></main>
+					</div>
+				  );
 				}
 			  }/>
 			  <Route path='/users' render={() => {
-				  return (<div><Header/><main><UserApp/></main></div>);
+				  return (
+				    <div>
+					  <Header/>
+					  <main><LoginContext.Provider value={this.state}><UserApp/></LoginContext.Provider></main>
+					</div>
+				  );
 				}
 			  }/>
 			  <Route path='/schedules' render={() => {
-				  return (<div><Header/><main><ScheduleApp/></main></div>);
+				  return (
+				    <div>
+					  <Header/>
+					  <main><LoginContext.Provider value={this.state}><ScheduleApp/></LoginContext.Provider></main>
+					</div>
+				  );
 				}
 			  }/>
 			</Switch>
