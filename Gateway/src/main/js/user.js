@@ -39,9 +39,9 @@ class UserApp extends React.Component {
 		this.loadFromServer(this.state.pageSize);
 		
 		stompClient.register(root, [
-			{route: '/users/topic/newUser', callback: this.refreshAndGoToLastPage},
-			{route: '/users/topic/updateUser', callback: this.refreshCurrentPage},
-			{route: '/users/topic/deleteUser', callback: this.refreshCurrentPage}
+			{route: '/topic/newUser', callback: this.refreshAndGoToLastPage},
+			{route: '/topic/updateUser', callback: this.refreshCurrentPage},
+			{route: '/topic/deleteUser', callback: this.refreshCurrentPage}
 		]);
 	}
 
@@ -76,7 +76,7 @@ class UserApp extends React.Component {
 		}).then(userCollection => {
 			return client({                               // 3. visit paging links profile /api/profile/users
 				method: 'GET',
-				path: rootApi + '/profile/users',
+				path: userCollection.entity._links.profile.href,
 				headers: {
 					'Accept': 'application/schema+json',
 					'Authorization': this.context.authorization
@@ -106,7 +106,7 @@ class UserApp extends React.Component {
 			return userCollection.entity._embedded.users.map(user =>
 					client({                              // 6. visit every user detail
 						method: 'GET',
-						path: rootApi + '/users/' + user.id,
+						path: user._links.self.href,
 						headers: {'Authorization': this.context.authorization}
 					})
 			);
@@ -157,7 +157,7 @@ class UserApp extends React.Component {
 			
 			client({
 				method: 'PUT',
-				path:  rootApi + '/users/' + user.id,
+				path: user.entity._links.self.href,
 				entity: updatedUser,
 				credentials: 'include',
 				headers: {
@@ -195,7 +195,7 @@ class UserApp extends React.Component {
 	onDelete(user) {
 		client({
 			method: 'DELETE', 
-			path:  rootApi + '/users/' + user.id,
+			path: user.entity._links.self.href,
 			credentials: 'include',
 			headers: {
 				'If-Match': user.headers.Etag,
@@ -229,7 +229,7 @@ class UserApp extends React.Component {
 			return userCollection.entity._embedded.users.map(user =>
 			        client({
 						method: 'GET',
-						path: rootApi + '/users/' + user.id,
+						path: user._links.self.href,
 						headers: {'Authorization': this.context.authorization}
 					})
 			);
@@ -279,7 +279,7 @@ class UserApp extends React.Component {
 				return userCollection.entity._embedded.users.map(user => {
 					return client({
 						method: 'GET',
-						path: rootApi + '/users/' + user.id,
+						path: user._links.self.href,
 						headers: {'Authorization': this.context.authorization}
 					})
 				});

@@ -21,7 +21,7 @@ public interface ScheduleService {
 
 	public Optional<Schedule> findById(Long id);
 
-	@PreAuthorize("#schedule?.manager == null or #schedule?.manager?.name == authentication?.name")
+	//@PreAuthorize("#schedule?.manager == null or #schedule?.manager?.name == authentication?.name")
 	public Schedule save(@Param("schedule") Schedule schedule);
 
 	public void deleteById(@Param("id") Long id);
