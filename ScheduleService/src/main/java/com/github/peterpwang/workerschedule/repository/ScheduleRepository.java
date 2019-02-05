@@ -12,7 +12,7 @@ import com.github.peterpwang.workerschedule.domain.Schedule;
  * @author Pei Wang
  *
  */
-//@PreAuthorize("hasRole('ROLE_MANAGER')")
+@PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface ScheduleRepository extends PagingAndSortingRepository<Schedule, Long> {
 	
 	Page<Schedule> findByNameIgnoreCaseContaining(Pageable pageable, String name);
