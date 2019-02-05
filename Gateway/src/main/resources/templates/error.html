@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml" xmlns:th="thymeleaf.org">
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset = "utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Spring Boot Application</title>
   <link rel="stylesheet" href="/styles/bootstrap.min.css"/>
   <link rel="stylesheet" href="/styles/style.css"/>
-  <script src="scripts/jquery-3.3.1.min.js"></script>
-  <script src="scripts/bootstrap.bundle.min.js"></script>
 </head>
 <body>
   <div>Errors happened. Go back to <a href="/">login</a> page.</div>
-  <span th:if="${errorCode != null}" class="error">Error code: ${errorCode}</span>
+  Error code: <span th:text="${errorCode}" class="error"></span>
 </body>
 </html>

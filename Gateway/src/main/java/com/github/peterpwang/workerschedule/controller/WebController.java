@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-public class WebController { //implements ErrorController {
+public class WebController implements ErrorController {
 
-    //private static final String PATH = "/error";
+    private static final String PATH = "/error";
 
 	@RequestMapping(value = "/")
 	public String index() {
 		return "index";
 	}
-/*
+
 	@RequestMapping(value = PATH)
 	public String error(HttpServletRequest request, Model model) {
 		Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
@@ -31,7 +31,7 @@ public class WebController { //implements ErrorController {
 		if (status != null) {
 			Integer statusCode = Integer.valueOf(status.toString());
 		 
-			if(statusCode == HttpStatus.NOT_FOUND.value()) {
+			if(statusCode == HttpStatus.UNAUTHORIZED.value()) {
 				return "error-401";
 			}
 			else if(statusCode == HttpStatus.FORBIDDEN.value()) {
@@ -52,5 +52,5 @@ public class WebController { //implements ErrorController {
     @Override
     public String getErrorPath() {
         return PATH;
-    }*/
+    }
 }
