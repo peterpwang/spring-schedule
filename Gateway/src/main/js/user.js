@@ -8,7 +8,7 @@ import LoginContext from './logincontext';
 const root = '/users';
 const rootApi = root + '/api';
 const cookies = new Cookies();
-var stompClient = require('./websocket-listener')
+//var stompClient = require('./websocket-listener')
 
 class UserApp extends React.Component {
 
@@ -37,12 +37,12 @@ class UserApp extends React.Component {
 
 	componentDidMount() {
 		this.loadFromServer(this.state.pageSize);
-		
-		stompClient.register(root, [
+		/* zuul not support yet */
+		/*stompClient.register(root, [
 			{route: '/topic/newUser', callback: this.refreshAndGoToLastPage},
 			{route: '/topic/updateUser', callback: this.refreshCurrentPage},
 			{route: '/topic/deleteUser', callback: this.refreshCurrentPage}
-		]);
+		]);*/
 	}
 
 	render() {
@@ -136,6 +136,8 @@ class UserApp extends React.Component {
 			}
 		}).done(response => {
 			/* Let the websocket handler update the state */
+			/* zuul not support yet. Refresh and go to last page */
+			this.refreshAndGoToLastPage();
 			// Hide the dialog
 			$('#createUser').modal('hide');
 		}, response => {
@@ -168,6 +170,8 @@ class UserApp extends React.Component {
 				}
 			}).done(response => {
 				/* Let the websocket handler update the state */
+				/* zuul not support yet. Refresh current page */
+				this.refreshCurrentPage();
 				// Hide the dialog
 				$('#update_' + index).modal('hide');
 			}, response => {
@@ -202,7 +206,11 @@ class UserApp extends React.Component {
 				'X-XSRF-TOKEN': this.state.csrfToken,
 				'Authorization': this.context.authorization
 			}
-		}).done(response => {/* let the websocket handle updating the UI */},
+		}).done(response => {
+				/* let the websocket handle updating the UI */
+				/* zuul not support yet. Refresh current page */
+				this.refreshCurrentPage();
+			},
 			response => {
 				if (response.status.code === 403) {
 					alert('ACCESS DENIED: You are not authorized to delete ' +
@@ -252,10 +260,10 @@ class UserApp extends React.Component {
 		}
 	}
 	
-	refreshAndGoToLastPage(message) {
+	refreshAndGoToLastPage() {
 		client({
 			method: 'GET', 
-			path: rootApi + "users?size=" + this.state.pageSize,
+			path: rootApi + "/users?size=" + this.state.pageSize,
 			headers: {'Authorization': this.context.authorization}
 		}).done(response => {
 			if (response.entity._links.last !== undefined) {
@@ -266,10 +274,10 @@ class UserApp extends React.Component {
 		});
 	}
 
-	refreshCurrentPage(message) {
+	refreshCurrentPage() {
 		client({
 			method: 'GET', 
-			path: rootApi + "users?size=" + this.state.pageSize + "&page=" + this.state.page.number,
+			path: rootApi + "/users?size=" + this.state.pageSize + "&page=" + this.state.page.number,
 			headers: {'Authorization': this.context.authorization}
 		}).then(userCollection => {
 			this.links = userCollection.entity._links;
