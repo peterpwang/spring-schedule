@@ -12,7 +12,7 @@ class ProfileApp extends React.Component {
 	}
 
 	render() {
-		return (<LogoutForm onLogout={this.onLogout}/>);
+		return (<LogoutForm onLogout={this.onLogout} loggedInManager={this.context.loggedInManager}/>); //issue on reactjs v16.7.0
 	}
 
 	onLogout(logout) {
@@ -23,7 +23,7 @@ class ProfileApp extends React.Component {
 				'Content-Type': 'application/json'
 			}
 		}).done(response => {
-			this.context.toggleLogin(null);
+			this.context.toggleLogin(null, null);
 			this.props.history.push('/'); //Redirected to login page
 		}, response => {
 			if (response.status.code === 403) {

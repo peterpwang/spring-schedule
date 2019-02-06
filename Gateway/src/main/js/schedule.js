@@ -23,8 +23,7 @@ class ScheduleApp extends React.Component {
 			pageSize: 10, 
 			searchKeyword: undefined,
 			links: {}, 
-			users: [],
-			loggedInManager: this.props.loggedInManager, 
+			users: [], 
 			csrfToken: undefined};
 		this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
@@ -67,8 +66,7 @@ class ScheduleApp extends React.Component {
 							onUpdate={this.onUpdate}
 							onDelete={this.onDelete}
 							updatePageSize={this.updatePageSize}
-							searchByName={this.searchByName}
-							loggedInManager={this.state.loggedInManager}/>
+							searchByName={this.searchByName}/>
 			</div>
 		)
 	}
@@ -159,7 +157,7 @@ class ScheduleApp extends React.Component {
 	}
 	
 	onUpdate(schedule, updatedSchedule, index) {
-		if(schedule.entity.manager === undefined || schedule.entity.manager.name === this.state.loggedInManager) {
+		if(schedule.entity.manager === undefined || schedule.entity.manager.name === this.context.loggedInManager) {
 			updatedSchedule["manager"] = schedule.entity.manager;
 			
 			client({
@@ -410,8 +408,7 @@ class ScheduleList extends React.Component{
 					users={this.props.users}
 					onUpdate={this.props.onUpdate}
 					onDelete={this.props.onDelete}
-					index={index}
-					loggedInManager={this.props.loggedInManager}/>
+					index={index}/>
 		);
 
 		const navLinks = [];
@@ -482,8 +479,7 @@ class Schedule extends React.Component{
 								  attributes={this.props.attributes}
 								  users={this.props.users}
 								  onUpdate={this.props.onUpdate}
-								  index={this.props.index}
-								  loggedInManager={this.props.loggedInManager}/>
+								  index={this.props.index}/>
 					 | <span><a href="#" onClick={this.handleDelete}>Delete</a></span>
 				</td>
 			</tr>

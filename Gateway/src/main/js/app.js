@@ -16,6 +16,7 @@ class App extends React.Component {
 		this.toggleLogin = this.toggleLogin.bind(this);		
 		this.state = {
             authorization: undefined,
+			loggedInManager: undefined,
 			toggleLogin: this.toggleLogin
 		};
 	}
@@ -60,9 +61,10 @@ class App extends React.Component {
 		)
 	}
 	
-	toggleLogin(newAuthorization) {
+	toggleLogin(newAuthorization, newLoggedInManager) {
 		this.setState(state => ({
-			authorization: newAuthorization
+			authorization: newAuthorization,
+			loggedInManager: newLoggedInManager
         }));
 	}
 }

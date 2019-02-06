@@ -20,7 +20,6 @@ class UserApp extends React.Component {
 			page: 1, 
 			pageSize: 10, 
 			links: {}, 
-			loggedInManager: this.props.loggedInManager, 
 			csrfToken: undefined};
 		this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
@@ -57,8 +56,7 @@ class UserApp extends React.Component {
 							onNavigate={this.onNavigate}
 							onUpdate={this.onUpdate}
 							onDelete={this.onDelete}
-							updatePageSize={this.updatePageSize}
-							loggedInManager={this.state.loggedInManager}/>
+							updatePageSize={this.updatePageSize}/>
 			</div>
 		)
 	}
@@ -154,7 +152,7 @@ class UserApp extends React.Component {
 	}
 	
 	onUpdate(user, updatedUser, index) {
-		if(user.entity.manager === undefined || user.entity.manager.name === this.state.loggedInManager) {
+		if(user.entity.manager === undefined || user.entity.manager.name === this.context.loggedInManager) {
 			updatedUser["manager"] = user.entity.manager;
 			
 			client({
@@ -370,8 +368,7 @@ class UserList extends React.Component{
 					attributes={this.props.attributes}
 					onUpdate={this.props.onUpdate}
 					onDelete={this.props.onDelete}
-					index={index}
-					loggedInManager={this.props.loggedInManager}/>
+					index={index}/>
 		);
 
 		const navLinks = [];
@@ -440,8 +437,7 @@ class User extends React.Component{
 						<UpdateDialog user={this.props.user}
 								  attributes={this.props.attributes}
 								  onUpdate={this.props.onUpdate}
-								  index={this.props.index}
-								  loggedInManager={this.props.loggedInManager}/>
+								  index={this.props.index}/>
 					| <span><a href="#" onClick={this.handleDelete}>Delete</a></span>
 				</td>
 			</tr>

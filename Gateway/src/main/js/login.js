@@ -27,7 +27,7 @@ class LoginApp extends React.Component {
 				'Content-Type': 'application/json'
 			}
 		}).done(response => {
-			this.context.toggleLogin(response.headers['Authorization']);
+			this.context.toggleLogin(response.headers['Authorization'], response.headers['Loggedinmanager']);
 			this.props.history.push('/profile'); //Redirected to profile page
 		}, response => {
 			if (response.status.code === 403) {
