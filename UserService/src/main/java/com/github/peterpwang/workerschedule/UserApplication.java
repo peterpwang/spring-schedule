@@ -10,9 +10,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  */
 @SpringBootApplication
 @EnableEurekaClient 	// Enable eureka client. It inherits from @EnableDiscoveryClient.
-public class WorkerscheduleApplication {
+public class UserApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WorkerscheduleApplication.class, args);
+		SpringApplication.run(UserApplication.class, args);
 	}
 }
