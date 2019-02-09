@@ -68,11 +68,14 @@ import com.github.peterpwang.workerschedule.util.Util;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = UserApplication.class)
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
+@WithMockUser(username = "peter", roles = {"MANAGER"})
 public class UserIntegrationTest {
 
-	private final String MANAGER_NAME = "peter";
-	private final String USER_NAME_1 = "andrew";
-	private final String USER_NAME_2 = "john";
+	private final Long MANAGER_ID = 10L;
+	private final String MANAGER_NAME = "paul";
+	private final Long USER_ID_1 = 1L;
+	private final String USER_NAME_1 = "james";
+	private final String USER_NAME_2 = "jane";
  
     @Autowired
     private MockMvc mvc;
@@ -88,28 +91,24 @@ public class UserIntegrationTest {
 		userRepository.deleteAll();
 	}
 
-	//@Test
-	@WithMockUser(username = "peter", password = "pass", roles = "MANAGER")
-	public void createUserThenStatus200() throws Exception {
+	@Test
+	public void createUserThenStatus201() throws Exception {
 
-		Manager manager = Util.newManager(MANAGER_NAME);
-		Manager newManager = managerRepository.save(manager);
-		User user = Util.newUser(USER_NAME_1, newManager);
+		Manager manager = Util.newManager(MANAGER_ID, MANAGER_NAME);
+		this.managerRepository.save(manager);
+		User user = Util.newUser(USER_ID_1, USER_NAME_1);
 		
 		mvc.perform(post("/users/api/users")
 		  .contentType(MediaType.APPLICATION_JSON)
 		  .content(Util.toJson(user))
 		  .with(csrf()))
-		  .andExpect(status().isOk())
-		  .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-		  .andExpect(jsonPath("$.name", is(USER_NAME_1)));
+		  .andExpect(status().isCreated());
 	}
 
 	@Test
-	@WithMockUser(username = "peter", password = "pass", roles = "MANAGER")
 	public void givenUsersWhenFindUsersThenStatus200() throws Exception {
 
-		User user = createAndSaveUser(USER_NAME_1, MANAGER_NAME);
+		createAndSaveUser(USER_ID_1, USER_NAME_1, MANAGER_ID, MANAGER_NAME);
 		
 		mvc.perform(get("/users/api/users")
 		  .contentType(MediaType.APPLICATION_JSON))
@@ -119,10 +118,9 @@ public class UserIntegrationTest {
 	}
 
 	@Test
-	@WithMockUser(username = "peter", password = "pass", roles = "MANAGER")
 	public void givenUsersWhenGetUserThenStatus200() throws Exception {
 
-		User user = createAndSaveUser(USER_NAME_1, MANAGER_NAME);
+		User user = createAndSaveUser(USER_ID_1, USER_NAME_1, MANAGER_ID, MANAGER_NAME);
 	
 		mvc.perform(get("/users/api/users/" + user.getId())
 		  .contentType(MediaType.APPLICATION_JSON))
@@ -131,33 +129,29 @@ public class UserIntegrationTest {
 		  .andExpect(jsonPath("$.name", is(USER_NAME_1)));
 	}
 
-	//@Test
-	@WithMockUser(username = "peter", password = "pass", roles = "MANAGER")
-	public void givenUsersWhenUpdateUserThenStatus200() throws Exception {
+	@Test
+	public void givenUsersWhenUpdateUserThenStatus201() throws Exception {
 
-		User user = createAndSaveUser(USER_NAME_1, MANAGER_NAME);
+		User user = createAndSaveUser(USER_ID_1, USER_NAME_1, MANAGER_ID, MANAGER_NAME);
 		user.setName(USER_NAME_2);
+		user.setPasswordRepeat(user.getPassword());
 
-		mvc.perform(put("/users/api/users/" + user.getId())
+		mvc.perform(put("/users/api/users/" + USER_ID_1)
 		  .contentType(MediaType.APPLICATION_JSON)
 		  .content(Util.toJson(user))
 		  .with(csrf()))
-		  .andExpect(status().isOk())
-		  .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-		  .andExpect(jsonPath("$.name", is(USER_NAME_2)));
+		  .andExpect(status().isCreated());
 	}
 
 	@Test
-	@WithMockUser(username = "peter", password = "pass", roles = "MANAGER")
 	public void givenUsersWhenDeleteUserThenStatus200() throws Exception {
 
-		User user = createAndSaveUser(USER_NAME_1, MANAGER_NAME);
+		User user = createAndSaveUser(USER_ID_1, USER_NAME_1, MANAGER_ID, MANAGER_NAME);
 
 		mvc.perform(delete("/users/api/users/" + user.getId())
 		  .contentType(MediaType.APPLICATION_JSON)
 		  .with(csrf()))
-		  .andExpect(status().isNoContent())
-		  .andExpect(content().contentTypeCompatibleWith("application/hal+json"));
+		  .andExpect(status().isNoContent());
 	}
  
 	@After
@@ -165,12 +159,12 @@ public class UserIntegrationTest {
 		userRepository.deleteAll();
 	}
 	
-	private User createAndSaveUser(String userName, String managerName)
+	private User createAndSaveUser(Long userId, String userName, Long managerId, String managerName)
 	{
-		Manager manager = Util.newManager(managerName);
-		Manager savedManager = managerRepository.save(manager);
-		User user = Util.newUser(userName, savedManager);
-		User savedUser = userRepository.save(user);
-		return savedUser;
+		Manager manager = Util.newManager(managerId, managerName);
+		Manager savedManager = this.managerRepository.save(manager);
+		User user = Util.newUser(userId, userName);
+		user.setManager(savedManager);
+		return this.userRepository.save(user);
 	}
 }

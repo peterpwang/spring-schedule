@@ -15,15 +15,15 @@ import com.github.peterpwang.workerschedule.domain.User;
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
 	@Override
-	@PreAuthorize("#user?.manager == null or #user?.manager?.name == authentication?.name")
+	@PreAuthorize("#user?.manager == null or #user?.manager?.name == authentication?.principal?.username")
 	User save(@Param("user") User user);
 
 	@Override
-	@PreAuthorize("@userRepository.findById(#id)?.manager?.name == authentication?.name")
+	@PreAuthorize("@userRepository.findById(#id)?.manager?.name == authentication?.principal?.username")
 	void deleteById(@Param("id") Long id);
 
 	@Override
-	@PreAuthorize("#user?.manager?.name == authentication?.name")
+	@PreAuthorize("#user?.manager?.name == authentication?.principal?.username")
 	void delete(@Param("user") User user);
 
 }

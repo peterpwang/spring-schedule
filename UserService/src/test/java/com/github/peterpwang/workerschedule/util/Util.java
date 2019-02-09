@@ -9,12 +9,16 @@ import com.github.peterpwang.workerschedule.domain.User;
 
 public class Util {
 
-	public static Manager newManager(String name) {
-		return new Manager(0L, name, "pass", "ROLE_MANAGER");
+	private static final Long MANAGER_ID = 10L;
+	private static final String MANAGER_NAME = "paul";
+
+	public static Manager newManager(Long id, String name) {
+		return new Manager(id, name, "pass", "ROLE_MANAGER");
 	}
 
-	public static User newUser(String name, Manager manager) {
-		return new User(0L, name, "pass", "pass", null, 1, 0L, manager);
+	public static User newUser(Long id, String name) {
+		Manager manager = newManager(MANAGER_ID, MANAGER_NAME);
+		return new User(id, name, "pass", "pass", null, 1, 0L, manager);
 	}
 
 	public static byte[] toJson(Object object) throws IOException {
