@@ -59,8 +59,7 @@ public class ScheduleController {
 	@Autowired
 	private UserRepository userRepository;
 
-	public ScheduleController(ScheduleService service) {
-		this.service = service;
+	public ScheduleController() {
 	}
 
 	/**

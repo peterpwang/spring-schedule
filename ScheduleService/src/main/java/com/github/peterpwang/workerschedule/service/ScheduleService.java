@@ -14,6 +14,7 @@ import com.github.peterpwang.workerschedule.domain.Schedule;
  * @author Pei Wang
  *
  */
+@PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface ScheduleService {
 	public Page<Schedule> findAll(Pageable pageable);
 
@@ -21,8 +22,9 @@ public interface ScheduleService {
 
 	public Optional<Schedule> findById(Long id);
 
-	//@PreAuthorize("#schedule?.manager == null or #schedule?.manager?.name == authentication?.name")
+	@PreAuthorize("#schedule?.manager == null or #schedule?.manager?.name == authentication?.principal?.username")
 	public Schedule save(@Param("schedule") Schedule schedule);
 
+	@PreAuthorize("@scheduleRepository.findById(#id)?.manager?.name == authentication?.principal?.username")
 	public void deleteById(@Param("id") Long id);
 }

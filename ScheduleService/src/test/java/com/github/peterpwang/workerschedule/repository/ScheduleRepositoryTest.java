@@ -22,10 +22,12 @@ import com.github.peterpwang.workerschedule.util.Util;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@WithMockUser(username = "peter", roles = {"MANAGER"})
 public class ScheduleRepositoryTest {
 
 	private final Long SCHEDULE_ID = 1L;
 	private final String SCHEDULE_NAME = "Schedule1";
+	private final String NEW_SCHEDULE_NAME = "ScheduleNew";
 	private final Long MANAGER_ID = 10L;
 	private final String MANAGER_NAME = "peter";
 	private final Long USER_ID = 100L;
@@ -40,7 +42,6 @@ public class ScheduleRepositoryTest {
 	@Autowired
 	private UserRepository userRepository;
 
-	@WithMockUser(roles = "MANAGER", username = "peter")
 	@Test
 	public void givenEmptyDBWhenFindByIdThenReturnEmptyOptional() {
 		Optional<Schedule> foundSchedule = scheduleRepository.findById(SCHEDULE_ID);
@@ -48,7 +49,6 @@ public class ScheduleRepositoryTest {
 		assertThat(foundSchedule.isPresent()).isEqualTo(false);
 	}
 
-	@WithMockUser(roles = "MANAGER", username = "peter")
 	@Test
 	public void givenScheduleInDBWhenFindByIdThenReturnOptionalWithSchedule() {
 
@@ -61,7 +61,6 @@ public class ScheduleRepositoryTest {
 		assertThat(foundSchedule.get().getName()).isEqualTo(SCHEDULE_NAME);
 	}
 
-	@WithMockUser(roles = "MANAGER", username = "peter")
 	@Test
 	public void givenEmptyDBWhenFindAllByPageThenReturnEmptyPage() {
 		PageRequest pagable = PageRequest.of(0, 10);
@@ -70,7 +69,6 @@ public class ScheduleRepositoryTest {
 		assertThat(foundSchedules.hasContent()).isEqualTo(false);
 	}
 
-	@WithMockUser(roles = "MANAGER", username = "peter")
 	@Test
 	public void givenScheduleInDBWhenFindAllThenReturnPageWithSchedule() {
 
@@ -85,6 +83,45 @@ public class ScheduleRepositoryTest {
 		assertThat(list.size()).isEqualTo(1);
 
 		assertThat(list.get(0).getName()).isEqualTo(SCHEDULE_NAME);
+	}
+
+	@Test
+	public void createScheduleInDBThenReturnSchedule() {
+		
+		Manager manager = Util.newManager(MANAGER_ID, MANAGER_NAME);
+		Manager createdManager = managerRepository.save(manager);
+
+		User user = Util.newUser(USER_ID, USER_NAME);
+		user.setManager(createdManager);
+		User createdUser = userRepository.save(user);
+
+		Schedule schedule = Util.newSchedule(SCHEDULE_ID, SCHEDULE_NAME);
+		schedule.setManager(createdManager);
+		schedule.setUser(createdUser);
+		Schedule savedSchedule = scheduleRepository.save(schedule);
+
+		assertThat(savedSchedule.getName()).isEqualTo(SCHEDULE_NAME);
+	}
+
+	@Test
+	public void givenScheduleInDBWhenUpdateThenReturnSchedule() {
+		
+		Schedule schedule = createScheduleInDB();
+
+		schedule.setName(NEW_SCHEDULE_NAME);
+		Schedule savedSchedule = scheduleRepository.save(schedule);
+
+		assertThat(savedSchedule.getName()).isEqualTo(NEW_SCHEDULE_NAME);
+	}
+
+	@Test
+	public void givenScheduleInDBWhenDeleteThenReturnVoid() {
+		
+		Schedule schedule = createScheduleInDB();
+		scheduleRepository.delete(schedule);
+		Optional<Schedule> foundSchedule = scheduleRepository.findById(schedule.getId());
+
+		assertThat(foundSchedule.isPresent()).isEqualTo(false);
 	}
 
 	@After

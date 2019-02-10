@@ -21,13 +21,13 @@ public class Util {
 
 	public static User newUser(Long id, String name) {
 		Manager manager = newManager(MANAGER_ID, MANAGER_NAME);
-		return new User(id, name, "pass", "pass", null, 1, 0L, manager);
+		return new User(id, name, "pass", "pass", "Description", 1, 0L, manager);
 	}
 
 	public static Schedule newSchedule(Long id, String name) {
 		Manager manager = newManager(MANAGER_ID, MANAGER_NAME);
 		User user = newUser(USER_ID, USER_NAME);
-		return new Schedule(id, name, null, 20181010, 800, 1800, 1, 0L, user, manager);
+		return new Schedule(id, name, "Description", 20181010, 800, 1800, 1, 0L, user, manager);
 	}
 
 	public static byte[] toJson(Object object) throws IOException {
