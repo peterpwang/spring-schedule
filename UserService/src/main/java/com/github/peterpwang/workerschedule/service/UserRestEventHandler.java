@@ -48,7 +48,8 @@ public class UserRestEventHandler {
 	@HandleBeforeSave
 	public void applyUserInformationUsingSecurityContext(User user) {
 
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		String name = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println("XXXXX: " + name);
 		Manager manager = this.managerRepository.findByName(name);
 		if (manager == null) {
 			Manager newManager = new Manager(0L, name, "", "ROLE_MANAGER");
