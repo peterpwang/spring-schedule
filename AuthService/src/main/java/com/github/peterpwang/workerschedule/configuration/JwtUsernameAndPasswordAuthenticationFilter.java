@@ -2,7 +2,9 @@ package com.github.peterpwang.workerschedule.configuration;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -67,9 +69,16 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 		
+		// Get role list
+		List<String> roleList = new ArrayList<String>();
+		for (GrantedAuthority au: auth.getAuthorities()) {
+			roleList.add(au.getAuthority());
+		}
+		String roles = String.join(",", roleList);
+		
 		Long now = System.currentTimeMillis();
 		String token = Jwts.builder()
-			.setSubject(auth.getName())	
+			.setSubject(auth.getName() + "|" + roles)  // Subject = name | roles
 			// Convert to list of strings. 
 			// This is important because it affects the way we get them back in the Gateway.
 			.claim("authorities", auth.getAuthorities().stream()

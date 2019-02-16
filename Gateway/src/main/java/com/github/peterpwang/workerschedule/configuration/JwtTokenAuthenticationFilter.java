@@ -54,10 +54,11 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 									.parseClaimsJws(token)
 									.getBody();
 							
-							String username = claims.getSubject();
-							if(username != null) {
+							String subject = claims.getSubject();
+							if(subject != null) {
+								int index = subject.indexOf('|');
 								// Record logged in user. Avoid calling itself.
-								super.addHeader("Loggedinmanager", username);
+								super.addHeader("Loggedinmanager", subject.substring(0, index));
 							}
 						} catch (Exception e) {
 							System.out.println("Claims: " + e);
@@ -94,7 +95,6 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 					.getBody();
 			
 			String username = claims.getSubject();
-		System.out.println("XXXXX: " + username);
 			if(username != null) {
 				@SuppressWarnings("unchecked")
 				List<String> authorities = (List<String>) claims.get("authorities");
