@@ -3,6 +3,11 @@ package com.github.peterpwang.workerschedule.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.Data;
 
+/**
+ * JWT configuration class
+ * @author Pei Wang
+ *
+ */
 @Data
 public class JwtConfig {
     @Value("${security.jwt.uri:/auth/**}")

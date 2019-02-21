@@ -34,15 +34,18 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.Schedule;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
 import com.github.peterpwang.workerschedule.service.ScheduleService;
-import com.github.peterpwang.workerschedule.controller.ScheduleController;
 import com.github.peterpwang.workerschedule.util.Util;
 
+/**
+ * Schedule controller test class
+ * @author Pei Wang
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -127,7 +130,6 @@ public class ScheduleControllerTest {
 
 	@Test
 	public void whenScheduleThenDeleteSchedule() throws Exception {
-		Schedule schedule = Util.newSchedule(SCHEDULE_ID_1, SCHEDULE_NAME_1);
 		Mockito.doNothing().when(service).deleteById(SCHEDULE_ID_1);
 		
 		mvc.perform(delete("/schedules/api/schedules/" + SCHEDULE_ID_1)

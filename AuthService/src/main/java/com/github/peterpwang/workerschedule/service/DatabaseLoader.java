@@ -30,7 +30,7 @@ public class DatabaseLoader implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... strings) throws Exception {
-		Manager peter = this.managerRepository.save(new Manager(0L, "peter", "pass", "ROLE_MANAGER"));
+		this.managerRepository.save(new Manager(0L, "peter", "pass", "ROLE_MANAGER"));
 
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("peter",
 				"doesn't matter", AuthorityUtils.createAuthorityList("ROLE_MANAGER")));

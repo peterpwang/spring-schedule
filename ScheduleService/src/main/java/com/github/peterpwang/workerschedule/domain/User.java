@@ -48,7 +48,7 @@ public class User {
 
 	private @ManyToOne Manager manager;
 
-	private User() {
+	public User() {
 	}
 
 	public User(Long id, String name, String password, String passwordRepeat, String description, Integer active,

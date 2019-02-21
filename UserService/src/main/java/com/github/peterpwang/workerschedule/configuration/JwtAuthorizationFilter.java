@@ -2,8 +2,8 @@ package com.github.peterpwang.workerschedule.configuration;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,8 +16,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
+/**
+ * JWT Authorization filter class
+ * @author Pei Wang
+ * Transfer JWT to Java Security
+ */
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	
 	private final JwtConfig jwtConfig;

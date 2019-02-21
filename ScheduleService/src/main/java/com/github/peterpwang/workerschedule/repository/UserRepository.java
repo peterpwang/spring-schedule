@@ -15,9 +15,6 @@ import com.github.peterpwang.workerschedule.domain.User;
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
 	@Override
-	User save(@Param("user") User user);
-
-	@Override
 	void deleteById(@Param("id") Long id);
 
 	@Override

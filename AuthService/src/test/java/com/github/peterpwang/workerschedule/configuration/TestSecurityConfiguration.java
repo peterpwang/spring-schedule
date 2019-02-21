@@ -6,6 +6,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 
+/**
+ * Security Configuration Test class
+ * @author Pei Wang
+ *
+ */
 @Configuration
 @EnableWebSecurity
 public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter{

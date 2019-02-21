@@ -30,6 +30,11 @@ import com.github.peterpwang.workerschedule.repository.ScheduleRepository;
 import com.github.peterpwang.workerschedule.repository.UserRepository;
 import com.github.peterpwang.workerschedule.util.Util;
 
+/**
+ * Schedule service test class
+ * @author Pei Wang
+ *
+ */
 @RunWith(SpringRunner.class)
 @WithMockUser(username = "peter", roles = {"MANAGER"})
 public class ScheduleServiceImplTest {
@@ -147,7 +152,7 @@ public class ScheduleServiceImplTest {
 		assertThat(fromDb.isPresent()).isEqualTo(true);
 		
 		Schedule schedule1 = fromDb.get();
-		scheduleService.deleteById(SCHEDULE_ID_1);
+		scheduleService.deleteById(schedule1.getId());
 	}
 
 	private void verifyFindByIdIsCalledOnce() {

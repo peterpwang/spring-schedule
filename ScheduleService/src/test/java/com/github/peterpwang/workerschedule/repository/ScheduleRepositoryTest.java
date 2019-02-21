@@ -20,6 +20,11 @@ import com.github.peterpwang.workerschedule.domain.Schedule;
 import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.util.Util;
 
+/**
+ * Schedule repository test class
+ * @author Pei Wang
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @WithMockUser(username = "peter", roles = {"MANAGER"})
@@ -72,7 +77,7 @@ public class ScheduleRepositoryTest {
 	@Test
 	public void givenScheduleInDBWhenFindAllThenReturnPageWithSchedule() {
 
-		Schedule createdSchedule = createScheduleInDB();
+		createScheduleInDB();
 
 		PageRequest pagable = PageRequest.of(0, 10);
 		Page<Schedule> foundSchedules = scheduleRepository.findAll(pagable);

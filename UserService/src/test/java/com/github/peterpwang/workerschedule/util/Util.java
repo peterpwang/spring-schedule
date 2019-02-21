@@ -7,6 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.User;
 
+/**
+ * Test utility class
+ * @author Pei Wang
+ *
+ */
 public class Util {
 
 	private static final Long MANAGER_ID = 10L;

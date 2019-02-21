@@ -14,6 +14,7 @@ import com.github.peterpwang.workerschedule.domain.User;
 @PreAuthorize("hasRole('ROLE_MANAGER')")
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@PreAuthorize("#user?.manager == null or #user?.manager?.name == authentication?.principal?.username")
 	User save(@Param("user") User user);

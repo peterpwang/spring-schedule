@@ -12,8 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -39,6 +39,7 @@ import com.github.peterpwang.workerschedule.repository.UserRepository;
 import com.github.peterpwang.workerschedule.service.ScheduleService;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Schedule controller class
@@ -70,7 +71,7 @@ public class ScheduleController {
 	 */
 	@GetMapping(value = "/schedules", produces = "application/hal+json")
 	public ResponseEntity<PagedResources<ScheduleResource>> findSchedule(Pageable pageable,
-			PagedResourcesAssembler assembler) {
+			PagedResourcesAssembler<Schedule> assembler) {
 		Page<Schedule> schedules = service.findAll(pageable);
 
 		PagedResources<ScheduleResource> resources = assembler.toResource(schedules, new ScheduleResourceAssembler());
@@ -93,7 +94,7 @@ public class ScheduleController {
 	 */
 	@GetMapping(value = "/schedulesByName", produces = "application/hal+json")
 	public ResponseEntity<PagedResources<ScheduleResource>> findSchedule(Pageable pageable, String name,
-			PagedResourcesAssembler assembler) {
+			PagedResourcesAssembler<Schedule> assembler) {
 		Page<Schedule> schedules = service.findByNameIgnoreCaseContaining(pageable, name);
 
 		PagedResources<ScheduleResource> resources = assembler.toResource(schedules, new ScheduleResourceAssembler());
@@ -118,7 +119,7 @@ public class ScheduleController {
 		Iterable<User> users = userRepository.findAll();
 		
 		Link self = ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/availableUsers").withRel("self");
-		Resources<User> userResources = new Resources(users, self);
+		Resources<User> userResources = new Resources<User>(users, self);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		return new ResponseEntity<>(userResources, responseHeaders, HttpStatus.OK);
 	}
@@ -297,6 +298,7 @@ public class ScheduleController {
  *
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 class ScheduleResource extends ResourceSupport {
 
 	private String name;

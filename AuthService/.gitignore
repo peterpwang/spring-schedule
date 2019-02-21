@@ -25,3 +25,4 @@
 /nbdist/
 /.nb-gradle/
 /bin/
+/.apt_generated_tests/

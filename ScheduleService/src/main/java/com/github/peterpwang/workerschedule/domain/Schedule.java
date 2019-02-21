@@ -17,6 +17,7 @@ import lombok.Data;
 
 /**
  * Schedule class
+ * @author Pei Wang
  */
 @Data
 @Entity
@@ -50,7 +51,7 @@ public class Schedule {
 
 	private @ManyToOne Manager manager;
 
-	private Schedule() {
+	public Schedule() {
 	}
 
 	public Schedule(Long id, String name, String description, Integer dateSchedule, Integer timeStart, Integer timeEnd,
