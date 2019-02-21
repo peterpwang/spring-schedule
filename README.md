@@ -14,6 +14,7 @@ Technical stacks:
 10. Support to H2.
 11. Test case.
 12. Microservices: Eureka, Zuul.
+13. Support Docker.
 
 
 To start the system:
