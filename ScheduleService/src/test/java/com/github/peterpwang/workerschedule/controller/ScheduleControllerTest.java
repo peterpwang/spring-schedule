@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.Schedule;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
+import com.github.peterpwang.workerschedule.repository.UserRepository;
 import com.github.peterpwang.workerschedule.service.ScheduleService;
 import com.github.peterpwang.workerschedule.util.Util;
 
@@ -68,6 +69,9 @@ public class ScheduleControllerTest {
 
 	@MockBean
 	private ManagerRepository managerRepository;
+
+	@MockBean
+	private UserRepository userRepository;
 
 	@Before
 	public void setUp() throws Exception {
@@ -116,6 +120,7 @@ public class ScheduleControllerTest {
 	public void whenScheduleThenUpdateSchedule() throws Exception {
 		Schedule schedule = Util.newSchedule(SCHEDULE_ID_1, SCHEDULE_NAME_1);
 		given(service.save(Mockito.any())).willReturn(schedule);
+		given(userRepository.save(Mockito.any())).willReturn(null);
 
 		schedule.setName(SCHEDULE_NAME_2);
 		
