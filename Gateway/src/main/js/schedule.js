@@ -127,6 +127,11 @@ class ScheduleApp extends React.Component {
 			}
 		});
 
+		if (newSchedule.user == undefined) {
+			alert('ACCESS DENIED: User is mandatory.');
+			return;
+		} 
+
 		client({
 			method: 'POST',
 			path: rootApi + "/schedules",
@@ -159,6 +164,11 @@ class ScheduleApp extends React.Component {
 	onUpdate(schedule, updatedSchedule, index) {
 		if(schedule.entity.manager === undefined || schedule.entity.manager.name === this.context.loggedInManager) {
 			updatedSchedule["manager"] = schedule.entity.manager;
+
+			if (updatedSchedule.user == undefined) {
+				alert('ACCESS DENIED: User is mandatory.');
+				return;
+			} 
 			
 			client({
 				method: 'PUT',

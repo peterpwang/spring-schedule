@@ -1,5 +1,7 @@
 package com.github.peterpwang.workerschedule.controller;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -29,14 +31,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.github.peterpwang.workerschedule.domain.Manager;
 import com.github.peterpwang.workerschedule.domain.Schedule;
 import com.github.peterpwang.workerschedule.domain.User;
 import com.github.peterpwang.workerschedule.repository.ManagerRepository;
 import com.github.peterpwang.workerschedule.repository.UserRepository;
 import com.github.peterpwang.workerschedule.service.ScheduleService;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -59,6 +69,11 @@ public class ScheduleController {
 
 	@Autowired
 	private UserRepository userRepository;
+
+    @Autowired
+    private EurekaClient eurekaClient;
+
+    private static String userServiceId = "user-service";
 
 	public ScheduleController() {
 	}
@@ -112,11 +127,26 @@ public class ScheduleController {
 	 * Find user list
 	 * @param assembler
 	 * @return ResponseEntity
+	 * @throws IOException
 	 */
 	@GetMapping(value = "/availableUsers", produces = "application/hal+json")
-	public ResponseEntity<Resources<User>> findAvailableUsers() {
-		// Todo: Call UserService
-		Iterable<User> users = userRepository.findAll();
+	public ResponseEntity<Resources<User>> findAvailableUsers() throws IOException {
+		
+        Application application = eurekaClient.getApplication(userServiceId);
+        InstanceInfo instanceInfo = application.getInstances().get(0);
+		String url =  "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort() + "/users/api/users";
+
+		// get list of available users 
+		RestTemplate restTemplate = new RestTemplate();
+		String response = restTemplate.getForObject(url, String.class);
+		
+		// Parse json and get user list
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		JsonNode jsonNode = objectMapper.readTree(response);
+		JsonNode usersNode = jsonNode.get("_embedded").get("users");
+		ObjectReader reader = objectMapper.readerFor(User[].class);
+		List<User> users = Arrays.asList(reader.readValue(usersNode));
 		
 		Link self = ControllerLinkBuilder.linkTo(ScheduleController.class).slash("/availableUsers").withRel("self");
 		Resources<User> userResources = new Resources<User>(users, self);
@@ -133,7 +163,13 @@ public class ScheduleController {
 	public Schedule newSchedule(@Valid @RequestBody Schedule newSchedule) {
 
 		applyScheduleInformationUsingSecurityContext(newSchedule);
-		System.out.println("Security applied: " + newSchedule.getManager().getName());
+		
+		// Backup for search
+		Optional<User> newUserOption = userRepository.findById(newSchedule.getUser().getId());
+		if (!newUserOption.isPresent()) {
+			userRepository.save(newSchedule.getUser());
+		}
+		
 		return service.save(newSchedule);
 	}
 
@@ -157,6 +193,12 @@ public class ScheduleController {
 	 */
 	@PutMapping("/schedules/{id}")
 	public Schedule updateSchedule(@RequestBody Schedule newSchedule, @PathVariable Long id) {
+		
+		// Backup for search
+		Optional<User> newUserOption = userRepository.findById(newSchedule.getUser().getId());
+		if (!newUserOption.isPresent()) {
+			userRepository.save(newSchedule.getUser());
+		}
 
 		return service.findById(id).map(schedule -> {
 			schedule.setName(newSchedule.getName());
