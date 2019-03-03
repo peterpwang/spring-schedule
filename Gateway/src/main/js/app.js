@@ -2,11 +2,11 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 
-import LoginApp from './login'; 
-import ProfileApp from './profile'; 
-import ScheduleApp from './schedule'; 
-import UserApp from './user'; 
-import LoginContext from './logincontext';
+import LoginApp from './auth/login'; 
+import ProfileApp from './auth/profile'; 
+import ScheduleApp from './schedule/schedule'; 
+import UserApp from './user/user'; 
+import LoginContext from './public/logincontext';
 
 class App extends React.Component {
 	
