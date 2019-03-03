@@ -1,6 +1,7 @@
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 /node_modules/
+.DS_Store
 
 ### STS ###
 .apt_generated
@@ -25,3 +26,4 @@
 /nbdist/
 /.nb-gradle/
 /bin/
+/.apt_generated_tests/
